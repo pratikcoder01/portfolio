@@ -235,3 +235,34 @@ scan band gone under reduced motion, identity row intact with 0px document overf
 `qa/links.mjs` reports 0 failures, with `linkedin.com/in/pratik-n` returning
 999 to headless clients (LinkedIn's bot gate) and therefore unverifiable from this machine.
 
+## Deploying (Vercel)
+
+The repo is a plain Next.js 15 app with no Vercel-specific config: import it and the framework preset does the
+right thing. Verified from a clean clone of the pushed commit, with no `.env.local` present:
+
+```
+npm ci        475 packages, 43 s
+next build    48 s, 13 static routes, First Load JS 155 kB
+```
+
+`playwright` and `lighthouse` are devDependencies but neither downloads a browser during install (Playwright 1.64
+has no postinstall script), so the CI install step stays at that time.
+
+**Set the environment variables before the first production deploy**, otherwise the site publishes its own setup
+notes: with `NEXT_PUBLIC_SITE_URL` unset, `metadataBase`, the canonical link and `og:url` all resolve to
+`http://localhost:3000`, and with the two contact variables unset the contact section renders the
+"set NEXT_PUBLIC_CONTACT_EMAIL / NEXT_PUBLIC_FORMSPREE_ID" fallback copy instead of real contact options.
+
+1. vercel.com → **Add New… → Project** → import `pratikcoder01/portfolio` (main).
+2. Environment Variables: `NEXT_PUBLIC_SITE_URL` = the production origin (you can set it after the first
+   preview deploy gives you the URL, then promote), plus `NEXT_PUBLIC_CONTACT_EMAIL` and
+   `NEXT_PUBLIC_FORMSPREE_ID` if you want those surfaces live.
+3. Build command `next build`, output directory `.next` — leave both at the detected defaults. No
+   `vercel.json` is needed; `outputFileTracingRoot` in `next.config.ts` is pinned to the project root so
+   the lockfile in your home directory cannot be mistaken for a monorepo root.
+4. Add a custom domain under Settings → Domains when you have one, then redeploy so the canonical URL and
+   sitemap pick it up.
+
+After it is live, point the QA runners at it (`node qa/links.mjs https://<origin>`) — `qa/links.mjs` checks
+internal anchors and external status from any base URL.
+
