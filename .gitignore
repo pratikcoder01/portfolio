@@ -1,0 +1,22 @@
+node_modules
+.next
+out
+build
+dist
+
+# env
+.env
+.env*.local
+
+# local artifacts
+profile.txt
+.research
+*.tsbuildinfo
+next-env.d.ts
+
+# qa output
+qa/screenshots
+qa/review
+qa/*.log
+qa/reports
+lighthouse-report-*.json

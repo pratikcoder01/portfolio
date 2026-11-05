@@ -1,0 +1,588 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Every colour is a channel triplet so Tailwind alpha modifiers
+     (bg-ink-card/45, border-volt/40 …) resolve per theme. Never hardcode a hex
+     in a component — add a token instead. */
+  :root,
+  [data-theme="dark"] {
+    --ink-rgb: 8 9 13;
+    --ink-raised-rgb: 13 15 22;
+    --ink-card-rgb: 17 20 32;
+    --paper-rgb: 236 238 245;
+    --paper-muted-rgb: 164 171 191;
+    --paper-faint-rgb: 118 126 150;
+    --volt-rgb: 124 140 255;
+    --volt-soft-rgb: 169 180 255;
+    --volt-deep-rgb: 79 95 212;
+    --danger-rgb: 255 179 192;
+
+    --bg: rgb(var(--ink-rgb));
+    --bg-raised: rgb(var(--ink-raised-rgb));
+    --bg-card: rgb(var(--ink-card-rgb));
+    --fg: rgb(var(--paper-rgb));
+    --fg-muted: rgb(var(--paper-muted-rgb));
+    --fg-faint: rgb(var(--paper-faint-rgb));
+    --volt: rgb(var(--volt-rgb));
+    --on-accent: #08090d;
+    --danger: rgb(var(--danger-rgb));
+
+    --line: rgba(255, 255, 255, 0.09);
+    --line-strong: rgba(255, 255, 255, 0.16);
+    --glow: rgba(124, 140, 255, 0.16);
+    --grid: rgba(255, 255, 255, 0.028);
+
+    color-scheme: dark;
+  }
+
+  [data-theme="light"] {
+    --ink-rgb: 246 246 249;
+    --ink-raised-rgb: 255 255 255;
+    --ink-card-rgb: 255 255 255;
+    --paper-rgb: 18 20 27;
+    --paper-muted-rgb: 75 81 98;
+    --paper-faint-rgb: 95 102 117;
+    --volt-rgb: 79 95 212;
+    --volt-soft-rgb: 58 73 189;
+    --volt-deep-rgb: 43 56 158;
+    --danger-rgb: 179 38 30;
+
+    --on-accent: #ffffff;
+    --grid: rgba(18, 22, 38, 0.05);
+    --glow: rgba(79, 95, 212, 0.1);
+
+    color-scheme: light;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    body {
+      transition: none;
+    }
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: theme(fontFamily.body);
+    /* Fine engineering-grid texture + one controlled glow. Painted once, fixed. */
+    background-image:
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px),
+      radial-gradient(70rem 42rem at 78% -8%, var(--glow), transparent 70%);
+    background-size: 72px 72px, 72px 72px, 100% 100%;
+    background-attachment: fixed, fixed, fixed;
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.35s ease, color 0.35s ease;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: theme(fontFamily.sans);
+    letter-spacing: theme(letterSpacing.display);
+  }
+
+  ::selection {
+    background: rgb(var(--volt-rgb) / 0.28);
+    color: var(--fg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--volt);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Anchored sections must not hide under the sticky nav. */
+  section[id] {
+    scroll-margin-top: 6.5rem;
+  }
+
+  input,
+  textarea,
+  button,
+  select {
+    font: inherit;
+  }
+}
+
+@layer components {
+  .shell {
+    @apply mx-auto w-full max-w-shell px-5 sm:px-8;
+  }
+
+  .eyebrow {
+    @apply font-sans text-[0.6875rem] uppercase tracking-label text-paper-faint;
+  }
+
+  .rule {
+    @apply h-px w-full bg-[var(--line)];
+  }
+
+  .link-quiet {
+    @apply text-paper-muted transition-colors duration-200 hover:text-paper;
+  }
+
+  /* Underline that animates in; used for inline prose links. */
+  .link-underline {
+    @apply relative text-volt underline decoration-[var(--line-strong)] underline-offset-4 transition-colors hover:decoration-volt;
+  }
+}
+
+@layer utilities {
+  .skip-link {
+    @apply sr-only;
+  }
+
+  .skip-link:focus-visible {
+    @apply not-sr-only fixed left-4 top-4 z-[100] rounded-lg border border-volt/40 bg-ink-raised px-4 py-2 font-sans text-sm text-paper shadow-lg;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .no-overflow-x {
+    overflow-x: clip;
+  }
+
+  /* Off-screen diagrams are skipped entirely: no layout, paint, or running
+     stroke animation until they come into view. */
+  .skip-offscreen {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 20rem;
+  }
+}
+
+/* Hero entrance. Deliberately transform-only and CSS-driven: an opacity:0 start
+   would keep the largest hero text out of the LCP until JavaScript finished,
+   and it left the sentence invisible for anyone whose JS failed to load. */
+@keyframes rise-in {
+  from {
+    transform: translate3d(0, var(--rise, 14px), 0);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes word-rise {
+  from {
+    transform: translate3d(0, 108%, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Below-the-fold section reveals, driven by one shared IntersectionObserver. */
+[data-reveal] {
+  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rise-in {
+    animation: rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--d, 0s);
+  }
+
+  .word-rise {
+    animation: word-rise 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--d, 0s);
+  }
+
+  [data-reveal="pending"] {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+}
+
+/* Theme switch icon swap: markup stays identical for both palettes so the
+   pre-paint theme script cannot cause a hydration mismatch. */
+.theme-icon-sun {
+  display: none;
+}
+
+[data-theme="light"] .theme-icon-sun {
+  display: block;
+}
+
+[data-theme="light"] .theme-icon-moon {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .theme-icon-moon,
+  .theme-icon-sun {
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+/* Hairline tick marks used behind section headers. */
+.ticks {
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--line) 0 1px,
+    transparent 1px 12px
+  );
+  height: 6px;
+}
+
+/* Architecture diagrams: signal travelling along documented connections. */
+@keyframes dashflow {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+.flow-edge {
+  stroke-dasharray: 4 5;
+  animation: dashflow 2.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-edge {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   TiltSurface - project cards as instrument panels.
+
+   The pointer tilts the card in real 3D (perspective + preserve-3d), and the
+   content sits on translateZ shelves so the title, chips and architecture
+   diagram separate into depth layers as the card turns.
+
+   Two layers are painted (pointer light, edge ring: their gradient centre must
+   stay inside the rounded card, so they read --mx/--my directly). Two layers
+   move on the compositor only (sheen, crosshair: their artwork is static and
+   the element is transformed). Nothing here touches layout.
+
+   Every decorative layer is gated on --engage, which only JavaScript sets.
+   No JS, coarse pointer, small screen, low-power device or reduced motion means
+   --engage is never written, so the card renders as a plain flat card.
+   ============================================================ */
+
+.tilt-root {
+  perspective: 800px;
+  perspective-origin: 50% 50%;
+}
+
+.tilt-inner {
+  position: relative;
+  height: 100%;
+  border-radius: 1rem;
+  transform-style: preserve-3d;
+}
+
+.tilt-card,
+.tilt-face {
+  transform-style: preserve-3d;
+}
+
+/* Depth shelves: the title floats off the card, the architecture diagram sits
+   furthest forward, so the card separates into layers as it turns. */
+[data-depth="1"] {
+  transform: translateZ(14px);
+}
+
+[data-depth="2"] {
+  transform: translateZ(26px);
+}
+
+[data-depth="3"] {
+  transform: translateZ(40px);
+}
+
+.tilt-light,
+.tilt-edge,
+.tilt-sheen,
+.tilt-cross,
+.tilt-ticks,
+.tilt-readout {
+  position: absolute;
+  pointer-events: none;
+}
+
+.tilt-light {
+  inset: 0;
+  border-radius: 1rem;
+  transform: translateZ(46px);
+  opacity: var(--engage, 0);
+  background: radial-gradient(
+    22rem 22rem at var(--mx, 50%) var(--my, 50%),
+    rgb(var(--volt-rgb) / 0.3),
+    rgb(var(--volt-rgb) / 0.11) 38%,
+    transparent 68%
+  );
+}
+
+/* 1px ring, brightest nearest the pointer: accent gradient masked down to the
+   border box only. */
+.tilt-edge {
+  inset: 0;
+  border-radius: 1rem;
+  padding: 1px;
+  transform: translateZ(47px);
+  opacity: var(--engage, 0);
+  background: radial-gradient(
+    15rem 15rem at var(--mx, 50%) var(--my, 50%),
+    rgb(var(--volt-rgb) / 0.95),
+    rgb(var(--volt-rgb) / 0.14) 55%,
+    rgb(var(--volt-rgb) / 0.22) 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) border-box;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) border-box;
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Diagonal gloss. Static artwork, compositor-moved by a few percent so it can
+   never bleed past the card gap. */
+.tilt-sheen {
+  inset: 0;
+  border-radius: 1rem;
+  transform: translate3d(
+      calc((var(--mx, 50%) - 50%) * 0.07),
+      calc((var(--my, 50%) - 50%) * -0.07),
+      45px
+    );
+  opacity: calc(var(--engage, 0) * 0.9);
+  background: radial-gradient(
+    65% 130% at 28% 6%,
+    rgb(var(--volt-rgb) / 0.14),
+    transparent 62%
+  );
+}
+
+/* Hairline crosshair tracking the pointer. Drawn at the centre of a full-card
+   element, so a percentage translate maps 1:1 to the pointer position and the
+   artwork never leaves the card. */
+.tilt-cross {
+  inset: 0;
+  transform: translateZ(44px);
+  opacity: calc(var(--engage, 0) * 0.6);
+}
+
+.tilt-cross-h {
+  background-image: linear-gradient(
+    to bottom,
+    transparent calc(50% - 0.5px),
+    rgb(var(--volt-rgb) / 0.36) calc(50% - 0.5px) calc(50% + 0.5px),
+    transparent calc(50% + 0.5px)
+  );
+  /* The line stops short of the rounded corners instead of crossing them. */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 14% 86%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 14% 86%, transparent);
+}
+
+.tilt-cross-v {
+  background-image: linear-gradient(
+    to right,
+    transparent calc(50% - 0.5px),
+    rgb(var(--volt-rgb) / 0.36) calc(50% - 0.5px) calc(50% + 0.5px),
+    transparent calc(50% + 0.5px)
+  );
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14% 86%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 14% 86%, transparent);
+}
+
+.tilt-cross-h {
+  transform: translate3d(0, calc(var(--my, 50%) - 50%), 44px);
+}
+
+.tilt-cross-v {
+  transform: translate3d(calc(var(--mx, 50%) - 50%), 0, 44px);
+}
+
+/* Corner brackets + normalised pointer readout: the nerd detail that says
+   "instrument", not "hero gradient". */
+.tilt-ticks {
+  inset: 11px;
+  transform: translateZ(48px);
+  opacity: var(--engage, 0);
+}
+
+.tilt-ticks i {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 1px solid rgb(var(--volt-rgb) / 0.6);
+}
+
+.tilt-ticks i:nth-child(1) { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+.tilt-ticks i:nth-child(2) { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+.tilt-ticks i:nth-child(3) { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+.tilt-ticks i:nth-child(4) { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+
+/* The readout lives in the card's left gutter, set vertically: it annotates the
+   surface like a drawing dimension instead of colliding with the content. */
+.tilt-readout {
+  left: 7px;
+  top: 50%;
+  writing-mode: vertical-rl;
+  transform: translate3d(0, -50%, 48px);
+  opacity: calc(var(--engage, 0) * 0.9);
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  color: rgb(var(--volt-rgb) / 0.85);
+}
+
+/* The lift needs something to land on: in light mode the glow on paper is too
+   faint to read as height, so the card casts a shadow instead. */
+.tilt-root[data-engaged="true"] .tilt-card {
+  box-shadow: 0 28px 70px -34px rgb(8 9 13 / 0.8);
+}
+
+[data-theme="light"] .tilt-root[data-engaged="true"] .tilt-card {
+  box-shadow: 0 26px 56px -28px rgb(18 20 27 / 0.3), 0 2px 6px -2px rgb(18 20 27 / 0.14);
+}
+
+/* Only pay for compositing while a pointer is actually on the card. */
+.tilt-root[data-engaged="true"] .tilt-inner {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+  .tilt-root {
+    perspective: none;
+  }
+
+  .tilt-inner {
+    transform: none !important;
+  }
+
+  .tilt-light,
+  .tilt-edge,
+  .tilt-sheen,
+  .tilt-cross,
+  .tilt-ticks,
+  .tilt-readout {
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+   PortraitPlate — the photograph in the hero.
+
+   The studio backdrop is light grey, so the frame vignettes toward its own
+   edges to sit inside the page instead of on top of it. The scan band is one
+   transformed element (three frames tall, band drawn at its centre), so the
+   animation is compositor-only and never touches layout.
+   ============================================================ */
+
+.portrait-frame {
+  box-shadow: 0 18px 46px -28px rgb(var(--volt-rgb) / 0.55);
+}
+
+.portrait-vignette {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(125% 105% at 50% 42%, transparent 42%, rgb(8 9 13 / 0.6) 100%);
+}
+
+[data-theme="light"] .portrait-vignette {
+  background: radial-gradient(125% 105% at 50% 42%, transparent 48%, rgb(18 20 27 / 0.24) 100%);
+}
+
+.portrait-scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -100%;
+  height: 300%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 48.4%,
+    rgb(var(--volt-rgb) / 0.55) 49.6% 50.4%,
+    transparent 51.6%
+  );
+  /* Idle it stays quiet; the sweep answers the pointer like the cards do. */
+  opacity: 0.3;
+  transition: opacity 0.45s ease-editorial;
+  animation: portrait-scan 9s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+
+.portrait-plate:hover .portrait-scan,
+.portrait-plate:focus-within .portrait-scan {
+  opacity: 0.9;
+}
+
+@keyframes portrait-scan {
+  from {
+    transform: translateY(-17%);
+  }
+  to {
+    transform: translateY(17%);
+  }
+}
+
+.portrait-ticks {
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+}
+
+.portrait-ticks i {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border: 1px solid rgb(var(--volt-rgb) / 0.75);
+}
+
+.portrait-ticks i:nth-child(1) { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+.portrait-ticks i:nth-child(2) { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+.portrait-ticks i:nth-child(3) { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+.portrait-ticks i:nth-child(4) { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+
+@media (min-width: 640px) {
+  .portrait-ticks {
+    inset: 7px;
+  }
+
+  .portrait-ticks i {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .portrait-ticks {
+    inset: 9px;
+  }
+
+  .portrait-ticks i {
+    width: 11px;
+    height: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portrait-scan {
+    display: none;
+  }
+}
