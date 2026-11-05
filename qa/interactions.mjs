@@ -284,15 +284,25 @@ const browser = await chromium.launch();
       await p.close();
     }
   } else {
-    const disabled = await page.getByRole("button", { name: /Send message/ }).isDisabled();
-    const notice = await page.locator("#contact").innerText();
-    ok("contact: disabled without a Formspree id", disabled, "");
-    ok("contact: unconfigured notice explains the env var", notice.includes("NEXT_PUBLIC_FORMSPREE_ID"));
+    // No Formspree id configured: the section must read as a finished contact
+    // block - a direct-line panel, no form, and no developer instructions.
+    await page.locator("#contact").scrollIntoViewIfNeeded();
+    const contactText = await page.locator("#contact").innerText();
+    ok("contact: no form is rendered without an endpoint", (await page.locator("#contact form").count()) === 0);
+    ok("contact: the direct-line panel replaces it",
+      (await page.locator("#contact a[href^='mailto:']").count()) >= 1 &&
+        (await page.locator("#contact a[target='_blank']").count()) >= 2,
+      { mailto: await page.locator("#contact a[href^='mailto:']").count() });
+    ok("contact: no environment-variable names leak into the UI",
+      !/NEXT_PUBLIC_|\.env\.local|Formspree id/i.test(contactText), { snippet: contactText.slice(0, 160) });
     const pageText = await page.locator("body").innerText();
-    const emails = pageText.match(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g) ?? [];
-    ok("contact: no email is rendered when env is unset", emails.length === 0, { emails });
+    ok("privacy: no env-var instructions anywhere on the page",
+      !/NEXT_PUBLIC_[A-Z_]+/.test(pageText), { matches: pageText.match(/NEXT_PUBLIC_[A-Z_]+/g) ?? [] });
     const phones = pageText.match(/(?<!\d)[6-9]\d{9}(?!\d)/g) ?? [];
     ok("privacy: no phone number is rendered anywhere", phones.length === 0, { phones });
+    const emails = [...new Set(pageText.match(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g) ?? [])];
+    ok("privacy: the only email shown is the configured one",
+      emails.every((e) => e.includes("@")) && emails.length <= 1, { emails });
   }
 
   await ctx.close();

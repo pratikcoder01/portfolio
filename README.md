@@ -19,8 +19,8 @@ All client-visible config goes through `NEXT_PUBLIC_*`. Nothing personal is hard
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `NEXT_PUBLIC_CONTACT_EMAIL` | no | The **only** place the site gets an email address from. If it is empty, the email is hidden everywhere and the contact section falls back to the form + social links. Phone numbers are never rendered. |
-| `NEXT_PUBLIC_FORMSPREE_ID` | for the form | Formspree form id. Without it the submit button is disabled and the form shows a "not live yet" notice. |
+| `NEXT_PUBLIC_CONTACT_EMAIL` | no | The **only** place the site gets an email address from. If it is empty, no address is rendered anywhere. Phone numbers are never rendered. |
+| `NEXT_PUBLIC_FORMSPREE_ID` | for the form | Formspree form id. Without it the form is not rendered at all: the right column becomes a "Direct line" panel (email + GitHub + LinkedIn), so an unconfigured deployment still reads as finished. |
 | `NEXT_PUBLIC_SITE_URL` | recommended | Canonical origin used by metadata, Open Graph, `sitemap.xml` and `robots.txt`. |
 
 `.env.local` is git-ignored. `.env.example` documents the shape.
@@ -37,6 +37,10 @@ All client-visible config goes through `NEXT_PUBLIC_*`. Nothing personal is hard
    (plus `_gotcha`, which is the honeypot and should never be displayed).
 5. Recommended submission settings: enable Formspree's built-in spam filtering and set a
    submission limit on your plan. Turn on email notifications so submissions reach your inbox.
+
+**Without an id** the form is not rendered and not merely disabled — `DirectPanel` takes its place: the
+configured email as the primary action, GitHub and LinkedIn beside it, and a line about what a useful brief
+looks like. Nothing in that state mentions environment variables, because a visitor cannot act on that.
 
 Client-side protections in `components/contact.tsx`:
 
@@ -225,7 +229,7 @@ nav underline, magnetic CTAs, timeline and skills map in CSS — which trades di
 was asked for, so it is left as a decision rather than done silently.
 
 `qa/responsive.mjs` covers 28 page × width × palette runs with 0 console errors and 0 overflow, clipping
-or contrast findings; `qa/interactions.mjs` reports 79/79 behaviour checks with 0 console errors — 25 of
+or contrast findings; `qa/interactions.mjs` reports 81/81 behaviour checks with 0 console errors — 25 of
 them the tilt surface, including that the plane really is `matrix3d`, that `--mx/--my` reach the light,
 that the layout box does not move while engaged, that the rAF loop stops once settled, that the card is
 flat and its decor invisible under reduced motion and on a 390px touch context, and that the card still
@@ -248,10 +252,11 @@ next build    48 s, 13 static routes, First Load JS 155 kB
 `playwright` and `lighthouse` are devDependencies but neither downloads a browser during install (Playwright 1.64
 has no postinstall script), so the CI install step stays at that time.
 
-**Set the environment variables before the first production deploy**, otherwise the site publishes its own setup
-notes: with `NEXT_PUBLIC_SITE_URL` unset, `metadataBase`, the canonical link and `og:url` all resolve to
-`http://localhost:3000`, and with the two contact variables unset the contact section renders the
-"set NEXT_PUBLIC_CONTACT_EMAIL / NEXT_PUBLIC_FORMSPREE_ID" fallback copy instead of real contact options.
+**Set `NEXT_PUBLIC_SITE_URL` before the first production deploy.** With it unset, `metadataBase`, the canonical
+link and `og:url` all resolve to `http://localhost:3000`, which is what a crawler and every shared link would
+then see. The contact section no longer depends on this: with `NEXT_PUBLIC_FORMSPREE_ID` unset it renders the
+"Direct line" panel instead of a form, and no environment-variable name appears in the page text at any
+configuration level (`qa/interactions.mjs` asserts that).
 
 1. vercel.com → **Add New… → Project** → import `pratikcoder01/portfolio` (main).
 2. Environment Variables: `NEXT_PUBLIC_SITE_URL` = the production origin (you can set it after the first

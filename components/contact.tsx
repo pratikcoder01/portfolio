@@ -1,11 +1,11 @@
 "use client";
 
-import { AlertCircle, Check, Send } from "lucide-react";
+import { AlertCircle, ArrowUpRight, Check, Send } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 
 import { Magnetic } from "@/components/magnetic";
 import { Reveal } from "@/components/reveal";
-import { contactEmail, formspreeId } from "@/lib/data";
+import { contactEmail, formspreeId, socials } from "@/lib/data";
 
 const COOLDOWN_SECONDS = 20;
 const MAX_PER_WINDOW = 3;
@@ -30,6 +30,58 @@ function readAttempts(): number[] {
   } catch {
     return [];
   }
+}
+
+/**
+ * DirectPanel — what the right column shows when no Formspree id is configured.
+ * It is a finished contact block, not an error state: no form, and no mention of
+ * environment variables, because a visitor has no idea what those are.
+ */
+function DirectPanel({ email }: { email: string | null }) {
+  return (
+    <div className="rounded-xl border border-[var(--line-strong)] bg-ink-card/45 p-6 sm:p-7">
+      <p className="eyebrow">Direct line</p>
+      <p className="mt-3 max-w-[42ch] text-[0.95rem] leading-relaxed text-paper">
+        {email
+          ? "Email works best - put the role or the problem in the first line and I will answer properly."
+          : "The fastest way to reach me is a message on GitHub or LinkedIn."}
+      </p>
+
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        {email && (
+          <Magnetic strength={0.2}>
+            <a
+              href={`mailto:${email}`}
+              className="inline-flex items-center gap-2 rounded-full bg-volt px-5 py-2.5 font-sans text-[0.88rem] font-medium text-[var(--on-accent)] transition-shadow hover:shadow-[0_0_0_4px_rgb(var(--volt-rgb)/0.22)]"
+            >
+              {email}
+              <Send className="h-4 w-4" aria-hidden="true" />
+            </a>
+          </Magnetic>
+        )}
+
+        {socials.map((s) => (
+          <Magnetic key={s.id} strength={0.16}>
+            <a
+              href={s.href}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] px-5 py-2.5 font-sans text-[0.88rem] text-paper transition-colors hover:border-volt/60 hover:bg-volt/10"
+            >
+              {s.label}
+              <ArrowUpRight className="h-4 w-4 text-volt" aria-hidden="true" />
+              <span className="sr-only">{`- ${s.handle} on ${s.label}, opens in a new tab`}</span>
+            </a>
+          </Magnetic>
+        ))}
+      </div>
+
+      <p className="mt-6 flex items-start gap-2 text-[0.78rem] leading-relaxed text-paper-faint">
+        <span className="mt-2 h-px w-4 shrink-0 bg-[var(--line-strong)]" aria-hidden="true" />
+        A short brief beats a long one: what you need, by when, and what done looks like.
+      </p>
+    </div>
+  );
 }
 
 export function Contact() {
@@ -173,148 +225,134 @@ export function Contact() {
           </p>
 
           <div className="mt-7 space-y-2 text-[0.86rem]">
-            {email ? (
-              <p>
-                <a href={`mailto:${email}`} className="link-underline">
-                  {email}
-                </a>
-              </p>
-            ) : (
-              <p className="text-paper-faint">
-                Direct email is not published on this site - set{" "}
-                <code className="rounded bg-ink-card px-1.5 py-0.5 text-[0.8rem] text-paper-muted">
-                  NEXT_PUBLIC_CONTACT_EMAIL
-                </code>{" "}
-                to display it.
-              </p>
-            )}
+            {/* With no endpoint the panel on the right already makes the address the
+                primary action, so the left column does not repeat it. */}
+            {endpoint &&
+              (email ? (
+                <p>
+                  <a href={`mailto:${email}`} className="link-underline">
+                    {email}
+                  </a>
+                </p>
+              ) : (
+                <p className="max-w-[40ch] text-paper-muted">
+                  No public email address on this page - use GitHub or LinkedIn and I will see it.
+                </p>
+              ))}
             <ul className="flex flex-wrap gap-x-5 gap-y-1 pt-1">
-              <li>
-                <a
-                  href="https://github.com/pratikcoder01"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="link-quiet"
-                >
-                  github.com/pratikcoder01
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.linkedin.com/in/pratik-n"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="link-quiet"
-                >
-                  linkedin.com/in/pratik-n
-                </a>
-              </li>
+              {socials.map((s) => (
+                <li key={s.id}>
+                  <a
+                    href={s.href}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="link-quiet"
+                  >
+                    {s.handle}
+                    <span className="sr-only">{` - ${s.label}, opens in a new tab`}</span>
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </Reveal>
 
         <Reveal>
-          {!endpoint && (
-            <p className="mb-4 rounded-lg border border-dashed border-[var(--line-strong)] px-4 py-3 text-[0.8rem] leading-relaxed text-paper-muted">
-              The form is not live yet on this deployment. Set{" "}
-              <code className="rounded bg-ink-card px-1.5 py-0.5 text-paper-muted">
-                NEXT_PUBLIC_FORMSPREE_ID
-              </code>{" "}
-              in <code>.env.local</code> to enable it{email ? ", or use the email address above" : ""}.
-            </p>
+          {endpoint ? (
+            <form ref={formRef} onSubmit={onSubmit} noValidate className="space-y-4">
+              {/* Honeypot - never visible, never focusable, discarded server-side. */}
+              <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+                <label htmlFor="contact-gotcha">Leave this field empty</label>
+                <input
+                  ref={honeypotRef}
+                  id="contact-gotcha"
+                  name="_gotcha"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="contact-name" className="eyebrow mb-2 block">
+                  Your name
+                </label>
+                <input {...field("name")} type="text" autoComplete="name" placeholder="Name" />
+                {errors.name && (
+                  <p id="contact-name-error" className="mt-1.5 flex items-center gap-1.5 text-[0.78rem] text-danger">
+                    <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
+                    {errors.name}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="contact-email" className="eyebrow mb-2 block">
+                  Email
+                </label>
+                <input
+                  {...field("email")}
+                  type="email"
+                  autoComplete="email"
+                  inputMode="email"
+                  placeholder="you@company.com"
+                />
+                {errors.email && (
+                  <p id="contact-email-error" className="mt-1.5 flex items-center gap-1.5 text-[0.78rem] text-danger">
+                    <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
+                    {errors.email}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="contact-message" className="eyebrow mb-2 block">
+                  Message
+                </label>
+                <textarea {...field("message")} rows={5} placeholder="What are you building or hiring for?" />
+                {errors.message && (
+                  <p id="contact-message-error" className="mt-1.5 flex items-center gap-1.5 text-[0.78rem] text-danger">
+                    <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
+                    {errors.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 pt-1">
+                <Magnetic strength={0.2}>
+                  <button
+                    type="submit"
+                    disabled={status.kind === "sending"}
+                    className="inline-flex items-center gap-2 rounded-full bg-volt px-5 py-2.5 font-sans text-[0.88rem] font-medium text-[var(--on-accent)] transition-[opacity,box-shadow] hover:shadow-[0_0_0_4px_rgb(var(--volt-rgb)/0.22)] disabled:cursor-not-allowed disabled:opacity-45"
+                  >
+                    {status.kind === "sending" ? "Sending" : "Send message"}
+                    {status.kind !== "sending" && <Send className="h-4 w-4" aria-hidden="true" />}
+                  </button>
+                </Magnetic>
+
+                <p aria-live="polite" className="min-h-[1.25rem] text-[0.8rem]">
+                  {status.kind === "sent" && (
+                    <span className="flex items-center gap-2 text-volt-soft">
+                      <Check className="h-4 w-4" aria-hidden="true" />
+                      Received - I will reply from this address.
+                    </span>
+                  )}
+                  {status.kind === "sending" && <span className="text-paper-muted">Sending...</span>}
+                  {(status.kind === "error" || status.kind === "limited") && (
+                    <span className="max-w-[46ch] text-danger">{status.text}</span>
+                  )}
+                  {status.kind === "idle" && endpoint && (
+                    <span className="text-paper-faint">
+                      Submissions go to Formspree. {COOLDOWN_SECONDS}s between sends, {MAX_PER_WINDOW} per
+                      5 minutes per device.
+                    </span>
+                  )}
+                </p>
+              </div>
+            </form>
+          ) : (
+            <DirectPanel email={email} />
           )}
-
-          <form ref={formRef} onSubmit={onSubmit} noValidate className="space-y-4">
-            {/* Honeypot - never visible, never focusable, discarded server-side. */}
-            <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
-              <label htmlFor="contact-gotcha">Leave this field empty</label>
-              <input
-                ref={honeypotRef}
-                id="contact-gotcha"
-                name="_gotcha"
-                type="text"
-                tabIndex={-1}
-                autoComplete="off"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="contact-name" className="eyebrow mb-2 block">
-                Your name
-              </label>
-              <input {...field("name")} type="text" autoComplete="name" placeholder="Name" />
-              {errors.name && (
-                <p id="contact-name-error" className="mt-1.5 flex items-center gap-1.5 text-[0.78rem] text-danger">
-                  <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
-                  {errors.name}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="contact-email" className="eyebrow mb-2 block">
-                Email
-              </label>
-              <input
-                {...field("email")}
-                type="email"
-                autoComplete="email"
-                inputMode="email"
-                placeholder="you@company.com"
-              />
-              {errors.email && (
-                <p id="contact-email-error" className="mt-1.5 flex items-center gap-1.5 text-[0.78rem] text-danger">
-                  <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
-                  {errors.email}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="contact-message" className="eyebrow mb-2 block">
-                Message
-              </label>
-              <textarea {...field("message")} rows={5} placeholder="What are you building or hiring for?" />
-              {errors.message && (
-                <p id="contact-message-error" className="mt-1.5 flex items-center gap-1.5 text-[0.78rem] text-danger">
-                  <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
-                  {errors.message}
-                </p>
-              )}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-4 pt-1">
-              <Magnetic strength={0.2}>
-                <button
-                  type="submit"
-                  disabled={!endpoint || status.kind === "sending"}
-                  className="inline-flex items-center gap-2 rounded-full bg-volt px-5 py-2.5 font-sans text-[0.88rem] font-medium text-[var(--on-accent)] transition-[opacity,box-shadow] hover:shadow-[0_0_0_4px_rgb(var(--volt-rgb)/0.22)] disabled:cursor-not-allowed disabled:opacity-45"
-                >
-                  {status.kind === "sending" ? "Sending" : "Send message"}
-                  {status.kind !== "sending" && <Send className="h-4 w-4" aria-hidden="true" />}
-                </button>
-              </Magnetic>
-
-              <p aria-live="polite" className="min-h-[1.25rem] text-[0.8rem]">
-                {status.kind === "sent" && (
-                  <span className="flex items-center gap-2 text-volt-soft">
-                    <Check className="h-4 w-4" aria-hidden="true" />
-                    Received - I will reply from this address.
-                  </span>
-                )}
-                {status.kind === "sending" && <span className="text-paper-muted">Sending...</span>}
-                {(status.kind === "error" || status.kind === "limited") && (
-                  <span className="max-w-[46ch] text-danger">{status.text}</span>
-                )}
-                {status.kind === "idle" && endpoint && (
-                  <span className="text-paper-faint">
-                    Submissions go to Formspree. {COOLDOWN_SECONDS}s between sends, {MAX_PER_WINDOW} per
-                    5 minutes per device.
-                  </span>
-                )}
-              </p>
-            </div>
-          </form>
         </Reveal>
       </div>
     </section>
