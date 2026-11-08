@@ -8,6 +8,7 @@ import { LoadReveal } from "@/components/load-reveal";
 import { MotionProvider } from "@/components/motion-provider";
 import { THEME_BOOTSTRAP, THEME_COLORS } from "@/lib/theme";
 import { profile } from "@/lib/data";
+import { siteUrl } from "@/lib/site";
 
 const grotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -22,8 +23,6 @@ const body = Inter({
   variable: "--font-body",
   display: "swap",
 });
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000";
 
 export const viewport: Viewport = {
   width: "device-width",
