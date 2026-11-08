@@ -3,8 +3,12 @@ import Link from "next/link";
 
 import { diagrams } from "@/components/architecture-diagrams";
 import { projects, type CaseSection, type Project } from "@/lib/data";
+import { showDrafts } from "@/lib/site";
 
 function SectionBlock({ project, section }: { project: Project; section: CaseSection }) {
+  // In production, skip entire todo sections — visitors never see draft scaffolding.
+  if (!showDrafts && section.status === "todo") return null;
+
   const Diagram =
     section.id === "architecture" && project.diagram ? diagrams[project.diagram] : null;
 
@@ -21,7 +25,7 @@ function SectionBlock({ project, section }: { project: Project; section: CaseSec
         <h2 id={`${section.id}-heading`} className="font-sans text-[1.25rem] font-medium sm:text-[1.45rem]">
           {section.title}
         </h2>
-        {section.status === "todo" && (
+        {showDrafts && section.status === "todo" && (
           <span className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-dashed border-volt/45 px-2.5 py-1 text-[0.68rem] uppercase tracking-label text-volt">
             <CircleAlert className="h-3 w-3" aria-hidden="true" />
             To be completed
@@ -30,6 +34,7 @@ function SectionBlock({ project, section }: { project: Project; section: CaseSec
       </div>
 
       {section.status === "todo" ? (
+        // showDrafts is true here (we returned null above when it's false)
         <p className="mt-4 max-w-[70ch] rounded-xl border border-dashed border-[var(--line-strong)] bg-ink-raised/40 px-4 py-3.5 text-[0.86rem] leading-relaxed text-paper-muted">
           {section.needed}
           <span className="mt-2 block text-[0.74rem] text-paper-faint">
@@ -76,7 +81,7 @@ function SectionBlock({ project, section }: { project: Project; section: CaseSec
             <p className="text-[0.75rem] italic text-paper-faint">{section.provenance}</p>
           )}
 
-          {section.needed && (
+          {showDrafts && section.needed && (
             <p className="max-w-[70ch] rounded-lg border border-dashed border-volt/35 bg-volt/[0.05] px-3.5 py-2.5 text-[0.8rem] leading-relaxed text-paper-muted">
               <span className="font-sans text-[0.68rem] uppercase tracking-label text-volt">
                 Still to add
@@ -91,6 +96,10 @@ function SectionBlock({ project, section }: { project: Project; section: CaseSec
 }
 
 export function CaseStudy({ project }: { project: Project }) {
+  // In production, only count/show documented sections.
+  const visibleSections = showDrafts
+    ? project.caseSections
+    : project.caseSections.filter((s) => s.status === "documented");
   const documented = project.caseSections.filter((s) => s.status === "documented").length;
 
   return (
@@ -131,7 +140,7 @@ export function CaseStudy({ project }: { project: Project }) {
             { term: "State", detail: project.status },
             {
               term: "Documented",
-              detail: `${documented} of ${project.caseSections.length} sections`,
+              detail: `${documented} of ${visibleSections.length} sections`,
             },
           ].map((cell) => (
             <div key={cell.term} className="bg-ink-raised px-4 py-3">
@@ -164,11 +173,11 @@ export function CaseStudy({ project }: { project: Project }) {
         </div>
 
         <ul className="mt-8 flex flex-wrap gap-x-4 gap-y-2 text-[0.78rem]">
-          {project.caseSections.map((s) => (
+          {visibleSections.map((s) => (
             <li key={s.id}>
               <a href={`#${s.id}`} className="link-quiet capitalize">
                 {s.title}
-                {s.status === "todo" && <span className="ml-1 text-volt">*</span>}
+                {showDrafts && s.status === "todo" && <span className="ml-1 text-volt">*</span>}
               </a>
             </li>
           ))}
@@ -177,7 +186,7 @@ export function CaseStudy({ project }: { project: Project }) {
 
       <div className="mt-4 grid gap-10 lg:grid-cols-[minmax(0,1fr)_14rem]">
         <div className="min-w-0">
-          {project.caseSections.map((section) => (
+          {visibleSections.map((section) => (
             <SectionBlock key={section.id} project={project} section={section} />
           ))}
         </div>
@@ -191,7 +200,7 @@ export function CaseStudy({ project }: { project: Project }) {
               ))}
             </ul>
             <p className="mt-5 text-[0.72rem] leading-relaxed text-paper-faint">
-              * marks a section waiting on source material.
+              {showDrafts && "* marks a section waiting on source material."}
             </p>
           </div>
         </aside>

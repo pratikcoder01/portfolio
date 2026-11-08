@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 
 import { Reveal } from "@/components/reveal";
 import { experience, type ExperienceEntry } from "@/lib/data";
+import { showDrafts } from "@/lib/site";
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion";
 
 function Entry({ item, isFirst }: { item: ExperienceEntry; isFirst: boolean }) {
@@ -80,7 +81,7 @@ function Entry({ item, isFirst }: { item: ExperienceEntry; isFirst: boolean }) {
               </ul>
             )}
 
-            {item.detailTodo && (
+            {showDrafts && item.detailTodo && (
               <p className="mt-4 rounded-lg border border-dashed border-volt/35 bg-volt/[0.06] px-3 py-2 text-[0.78rem] text-paper-muted">
                 <span className="font-sans text-[0.7rem] uppercase tracking-label text-volt">
                   To be completed

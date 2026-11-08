@@ -4,6 +4,7 @@ import Link from "next/link";
 import { diagrams } from "@/components/architecture-diagrams";
 import { TiltSurface } from "@/components/tilt-surface";
 import type { Project } from "@/lib/data";
+import { showDrafts } from "@/lib/site";
 
 export function ProjectCard({ project, index }: { project: Project; index: number }) {
   const Diagram = project.diagram ? diagrams[project.diagram] : null;
@@ -91,7 +92,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
           <div data-depth="2" className="mt-auto flex items-end justify-between gap-4 pt-6">
             <p className="text-[0.72rem] text-paper-faint">
               {project.status}
-              {todoCount > 0 && (
+              {showDrafts && todoCount > 0 && (
                 <>
                   {" - "}
                   <span className="text-volt">
