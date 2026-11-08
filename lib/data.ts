@@ -59,6 +59,8 @@ export const sources: Record<SourceId, SourceRef> = {
     id: "number-guessing-game",
     label: "Number Guessing Game (C++)",
     kind: "project",
+    // TODO(pratik): repo URL has a typo in the GitHub name ("NUmber-gussing-game-").
+    // Leave as-is until you rename the repo on GitHub so the existing link keeps working.
     href: "https://github.com/pratikcoder01/NUmber-gussing-game-",
   },
   flyrank: { id: "flyrank", label: "FlyRank AI", kind: "role" },
@@ -258,6 +260,7 @@ export const education = [
   {
     school: "St. Francis Institute of Technology",
     credential: "B.Tech, Computer Engineering",
+    // TODO(pratik): confirm dates — "Expected Aug 2026" overlaps the diploma period below.
     period: "Expected Aug 2026",
   },
   {
@@ -272,13 +275,20 @@ export const education = [
   },
 ] as const;
 
-export const certifications = [
-  { name: "Introduction to Retrieval-Augmented Generation", issuer: "Verified on LinkedIn profile" },
-  { name: "Problem Solving (Basic)", issuer: "Verified on LinkedIn profile" },
+export interface Certification {
+  name: string;
+  /** Issuing organisation. null means the issuer is not yet confirmed from a primary source. */
+  issuer: string | null;
+}
+
+// NEEDS INPUT: replace null issuers with the real platform names (e.g. "DeepLearning.AI", "HackerRank").
+export const certifications: Certification[] = [
+  { name: "Introduction to Retrieval-Augmented Generation", issuer: null },
+  { name: "Problem Solving (Basic)", issuer: null },
   { name: "AWS Educate - Machine Learning Foundations", issuer: "AWS Educate" },
   { name: "AWS Educate - Getting Started with Databases", issuer: "AWS Educate" },
   { name: "AWS Educate - Getting Started with Compute", issuer: "AWS Educate" },
-] as const;
+];
 
 /* ------------------------------------------------------------------ */
 /* Skills + evidence map                                               */
@@ -318,7 +328,7 @@ export const skills: Skill[] = [
   { name: "TanStack Query", group: "Frontend", evidence: ["athlix"] },
   { name: "Zustand", group: "Frontend", evidence: ["athlix"] },
   { name: "React Hook Form + Zod", group: "Frontend", evidence: ["athlix"] },
-  { name: "Accessible UI / focus states", group: "Frontend", evidence: ["flyrank", "athlix"] },
+  { name: "Accessible UI / focus states", group: "Frontend", evidence: ["athlix"] },
 
   { name: "Node.js", group: "Backend & Data", evidence: ["athlix"] },
   { name: "Express.js", group: "Backend & Data", evidence: ["athlix"] },
@@ -757,6 +767,8 @@ export const projects: Project[] = [
     role: "C++ Developer, CodeAlpha",
     period: "Jun 2024",
     status: "Source published",
+    // TODO(pratik): repo URL has a typo in the GitHub name ("NUmber-gussing-game-").
+    // Leave as-is until you rename the repo on GitHub so the existing link keeps working.
     repo: "https://github.com/pratikcoder01/NUmber-gussing-game-",
     diagram: null,
     stack: ["C++", "OOP", "ANSI console I/O"],

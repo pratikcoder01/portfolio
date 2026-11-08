@@ -62,7 +62,9 @@ export function EducationSection() {
                   />
                   <span>
                     {c.name}
-                    <span className="block text-[0.72rem] text-paper-faint">{c.issuer}</span>
+                    {c.issuer && (
+                      <span className="block text-[0.72rem] text-paper-faint">{c.issuer}</span>
+                    )}
                   </span>
                 </li>
               ))}
