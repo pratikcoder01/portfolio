@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 import { SiteNav } from "@/components/site-nav";
@@ -10,18 +10,18 @@ import { THEME_BOOTSTRAP, THEME_COLORS } from "@/lib/theme";
 import { profile } from "@/lib/data";
 import { siteUrl } from "@/lib/site";
 
-const grotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const grotesk = localFont({
+  src: "./fonts/space-grotesk.woff2",
   variable: "--font-grotesk",
   display: "swap",
+  weight: "400 700",
 });
 
-const body = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500"],
+const body = localFont({
+  src: "./fonts/inter.woff2",
   variable: "--font-body",
   display: "swap",
+  weight: "400 500",
 });
 
 export const viewport: Viewport = {
