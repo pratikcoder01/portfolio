@@ -21,7 +21,10 @@ All client-visible config goes through `NEXT_PUBLIC_*`. Nothing personal is hard
 | --- | --- | --- |
 | `NEXT_PUBLIC_CONTACT_EMAIL` | no | The **only** place the site gets an email address from. If it is empty, no address is rendered anywhere. Phone numbers are never rendered. |
 | `NEXT_PUBLIC_FORMSPREE_ID` | for the form | Formspree form id. Without it the form is not rendered at all: the right column becomes a "Direct line" panel (email + GitHub + LinkedIn), so an unconfigured deployment still reads as finished. |
-| `NEXT_PUBLIC_SITE_URL` | recommended | Canonical origin used by metadata, Open Graph, `sitemap.xml` and `robots.txt`. |
+| `NEXT_PUBLIC_SITE_URL` | recommended | Canonical origin used by metadata, Open Graph, `sitemap.xml` and `robots.txt`. Falls back to `https://${VERCEL_PROJECT_PRODUCTION_URL}` on Vercel, then `http://localhost:3000`. |
+| `NEXT_PUBLIC_SHOW_DRAFTS` | no | Set to `"true"` on preview deployments to show todo sections and "To be completed" markers. Always hidden in production. |
+
+> **Required on Vercel:** Set `NEXT_PUBLIC_CONTACT_EMAIL` and `NEXT_PUBLIC_FORMSPREE_ID` in your Vercel project's Environment Variables before the first production deploy if you want the contact form and email link active.
 
 `.env.local` is git-ignored. `.env.example` documents the shape.
 

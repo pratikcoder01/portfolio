@@ -1,11 +1,12 @@
 "use client";
 
-import { AlertCircle, ArrowUpRight, Check, Send } from "lucide-react";
+import { AlertCircle, ArrowUpRight, Check, Download, Send } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 
 import { Magnetic } from "@/components/magnetic";
 import { Reveal } from "@/components/reveal";
 import { contactEmail, formspreeId, socials } from "@/lib/data";
+import { resumeExists } from "@/lib/site";
 
 const COOLDOWN_SECONDS = 20;
 const MAX_PER_WINDOW = 3;
@@ -80,6 +81,18 @@ function DirectPanel({ email }: { email: string | null }) {
         <span className="mt-2 h-px w-4 shrink-0 bg-[var(--line-strong)]" aria-hidden="true" />
         A short brief beats a long one: what you need, by when, and what done looks like.
       </p>
+
+      {resumeExists && (
+        <a
+          href="/resume.pdf"
+          download
+          aria-label="Download resume (PDF)"
+          className="mt-5 inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] px-5 py-2.5 font-sans text-[0.88rem] text-paper transition-colors hover:border-volt/60 hover:bg-volt/10"
+        >
+          <Download className="h-4 w-4 text-volt" aria-hidden="true" />
+          Download résumé
+        </a>
+      )}
     </div>
   );
 }
@@ -261,6 +274,19 @@ export function Contact() {
                 </li>
               ))}
             </ul>
+            {resumeExists && (
+              <p className="pt-2">
+                <a
+                  href="/resume.pdf"
+                  download
+                  aria-label="Download resume (PDF)"
+                  className="link-quiet inline-flex items-center gap-1.5"
+                >
+                  <Download className="h-3.5 w-3.5 text-volt" aria-hidden="true" />
+                  Résumé
+                </a>
+              </p>
+            )}
           </div>
         </Reveal>
 

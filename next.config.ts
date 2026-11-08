@@ -1,8 +1,16 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import fs from "fs";
+import path from "path";
+import type { NextConfig } from "next";
+
+const hasResume = fs.existsSync(path.join(process.cwd(), "public", "resume.pdf"));
+
+const nextConfig: NextConfig = {
   reactStrictMode: true,
   // A stray lockfile exists in the home directory; pin tracing to this project.
   outputFileTracingRoot: process.cwd(),
+  env: {
+    NEXT_PUBLIC_HAS_RESUME: hasResume ? "true" : "false",
+  },
   async headers() {
     return [
       {

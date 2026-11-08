@@ -1,7 +1,8 @@
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Download } from "lucide-react";
 import Link from "next/link";
 
 import { profile, sections, socials } from "@/lib/data";
+import { resumeExists } from "@/lib/site";
 
 export function SiteFooter() {
   return (
@@ -43,6 +44,19 @@ export function SiteFooter() {
                   Case studies
                 </Link>
               </li>
+              {resumeExists && (
+                <li>
+                  <a
+                    href="/resume.pdf"
+                    download
+                    aria-label="Download resume (PDF)"
+                    className="link-quiet inline-flex items-center gap-1.5"
+                  >
+                    <Download className="h-3 w-3" aria-hidden="true" />
+                    Résumé
+                  </a>
+                </li>
+              )}
             </ul>
           </nav>
         </div>
