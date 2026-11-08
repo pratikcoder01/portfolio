@@ -161,10 +161,17 @@ export function Contact() {
       });
 
       if (response.ok) {
-        window.localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify([...readAttempts(), Date.now()]),
-        );
+        // Wrap in try/catch: a storage failure (e.g. private-browsing quota,
+        // SecurityError) must never turn a successful send into an error state.
+        try {
+          window.localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify([...readAttempts(), Date.now()]),
+          );
+        } catch {
+          // Storage unavailable — rate-limit tracking is skipped this round,
+          // but the message was sent successfully so we still show "Received".
+        }
         setCooldown(COOLDOWN_SECONDS);
         setValues({ name: "", email: "", message: "" });
         setStatus({ kind: "sent" });
