@@ -1,12 +1,12 @@
 /**
  * Inline SVG architecture diagrams.
- * Designed with a clean, technical Linear/Stripe engineering documentation aesthetic:
- * crisp borders, structured hierarchies, clear labels, and readable typography.
+ * Designed with a clean, technical blueprint aesthetic:
+ * sharp micro-radii, monospace protocol/port labels, structured hierarchies, and crisp orthogonal edges.
  */
 
-const TITLE = { fontSize: 13, fontWeight: 500, fill: "var(--fg)" } as const;
-const SUB = { fontSize: 10.5, fill: "var(--fg-muted)" } as const;
-const LABEL = { fontSize: 10, fill: "var(--fg-faint)", fontWeight: 400 } as const;
+const TITLE = { fontSize: 12, fontWeight: 600, fill: "var(--fg)", letterSpacing: "0.01em" } as const;
+const SUB = { fontSize: 9.5, fill: "var(--fg-muted)", fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" } as const;
+const LABEL = { fontSize: 9, fill: "rgb(var(--volt-rgb))", fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace", fontWeight: 600, letterSpacing: "0.04em" } as const;
 
 interface BoxProps {
   x: number;
@@ -20,7 +20,7 @@ interface BoxProps {
 
 function Box({ x, y, w, h, title, sub = [], dashed }: BoxProps) {
   const cx = x + w / 2;
-  const titleY = sub.length ? y + 24 : y + h / 2 + 4.5;
+  const titleY = sub.length ? y + 22 : y + h / 2 + 4;
   return (
     <g>
       <rect
@@ -28,17 +28,17 @@ function Box({ x, y, w, h, title, sub = [], dashed }: BoxProps) {
         y={y}
         width={w}
         height={h}
-        rx={8}
+        rx={2}
         fill="var(--bg-card)"
-        stroke={dashed ? "rgb(var(--volt-rgb) / 0.45)" : "var(--line-strong)"}
+        stroke={dashed ? "rgb(var(--volt-rgb) / 0.55)" : "var(--line-strong)"}
         strokeWidth={1}
-        strokeDasharray={dashed ? "3 3" : undefined}
+        strokeDasharray={dashed ? "4 3" : undefined}
       />
       <text x={cx} y={titleY} textAnchor="middle" style={TITLE}>
         {title}
       </text>
       {sub.map((line, i) => (
-        <text key={line} x={cx} y={y + 40 + i * 13} textAnchor="middle" style={SUB}>
+        <text key={line} x={cx} y={y + 38 + i * 13} textAnchor="middle" style={SUB}>
           {line}
         </text>
       ))}
@@ -62,7 +62,7 @@ function Edge({ d, uid, dashed, bidirectional, label, labelX = 0, labelY = 0 }: 
       <path
         d={d}
         fill="none"
-        stroke="rgb(var(--volt-rgb) / 0.65)"
+        stroke="rgb(var(--volt-rgb) / 0.75)"
         strokeWidth={1.25}
         strokeDasharray={dashed ? "3 3" : undefined}
         markerEnd={`url(#tip-${uid})`}

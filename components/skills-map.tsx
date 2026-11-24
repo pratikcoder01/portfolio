@@ -53,32 +53,39 @@ export function SkillsMap() {
     return counts;
   }, []);
 
+  const rafId = useRef<number | null>(null);
+
   const draw = useCallback(() => {
-    const wrap = wrapRef.current;
-    if (!wrap || !active) {
-      setLines([]);
-      return;
-    }
-    const base = wrap.getBoundingClientRect();
-    const from = skillRefs.current[active.name]?.getBoundingClientRect();
-    if (!from) {
-      setLines([]);
-      return;
-    }
-    const next: Line[] = active.evidence.map((id) => {
-      const to = sourceRefs.current[id]?.getBoundingClientRect();
-      if (!to) return null;
-      const x1 = from.right - base.left - 1;
-      const y1 = from.top - base.top + from.height / 2;
-      const x2 = to.left - base.left + 1;
-      const y2 = to.top - base.top + to.height / 2;
-      const bend = Math.max(28, (x2 - x1) * 0.45);
-      return {
-        key: `${active.name}-${id}`,
-        d: `M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}`,
-      };
-    }).filter((l): l is Line => l !== null);
-    setLines(next);
+    if (rafId.current) cancelAnimationFrame(rafId.current);
+    rafId.current = requestAnimationFrame(() => {
+      const wrap = wrapRef.current;
+      if (!wrap || !active) {
+        setLines([]);
+        return;
+      }
+      const base = wrap.getBoundingClientRect();
+      const from = skillRefs.current[active.name]?.getBoundingClientRect();
+      if (!from) {
+        setLines([]);
+        return;
+      }
+      const next: Line[] = active.evidence
+        .map((id) => {
+          const to = sourceRefs.current[id]?.getBoundingClientRect();
+          if (!to) return null;
+          const x1 = from.right - base.left - 1;
+          const y1 = from.top - base.top + from.height / 2;
+          const x2 = to.left - base.left + 1;
+          const y2 = to.top - base.top + to.height / 2;
+          const bend = Math.max(28, (x2 - x1) * 0.45);
+          return {
+            key: `${active.name}-${id}`,
+            d: `M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}`,
+          };
+        })
+        .filter((l): l is Line => l !== null);
+      setLines(next);
+    });
   }, [active]);
 
   useLayoutEffect(() => {
@@ -86,10 +93,24 @@ export function SkillsMap() {
   }, [draw]);
 
   useEffect(() => {
-    const onResize = () => draw();
-    window.addEventListener("resize", onResize);
-    document.fonts?.ready.then(() => draw()).catch(() => undefined);
-    return () => window.removeEventListener("resize", onResize);
+    const handleUpdate = () => draw();
+    window.addEventListener("resize", handleUpdate, { passive: true });
+    window.addEventListener("scroll", handleUpdate, { passive: true });
+
+    let ro: ResizeObserver | null = null;
+    if (wrapRef.current && typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(handleUpdate);
+      ro.observe(wrapRef.current);
+    }
+
+    document.fonts?.ready.then(handleUpdate).catch(() => undefined);
+
+    return () => {
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+      window.removeEventListener("resize", handleUpdate);
+      window.removeEventListener("scroll", handleUpdate);
+      ro?.disconnect();
+    };
   }, [draw]);
 
   const grouped = useMemo(
@@ -136,7 +157,7 @@ export function SkillsMap() {
           <div className="relative z-10 space-y-7">
             {grouped.map(({ group, items }) => (
               <div key={group}>
-                <h3 className="eyebrow mb-3">{group}</h3>
+                <h3 className="eyebrow mb-3 font-mono text-[0.72rem] tracking-wider text-paper-faint">{group}</h3>
                 <ul className="flex flex-wrap gap-1.5">
                   {items.map((s) => {
                     const isActive = active?.name === s.name;
@@ -154,15 +175,15 @@ export function SkillsMap() {
                           onFocus={() => setHovered(s.name)}
                           onBlur={() => setHovered(null)}
                           onClick={() => setPinned((p) => (p === s.name ? null : s.name))}
-                          className={`rounded-lg border px-2.5 py-1.5 text-left text-[0.8rem] transition-colors duration-200 ${
+                          className={`rounded-sm border px-2.5 py-1.5 text-left text-[0.8rem] transition-colors duration-200 ${
                             isActive
                               ? "border-volt/70 bg-volt/15 text-paper"
                               : "border-[var(--line)] bg-ink-raised/70 text-paper-muted hover:border-[var(--line-strong)] hover:text-paper"
                           }`}
                         >
-                          {s.name}
-                          <span className="ml-2 font-sans text-[0.68rem] text-paper-faint">
-                            {s.evidence.length > 0 ? s.evidence.length : "cert"}
+                          <span className="font-sans font-medium">{s.name}</span>
+                          <span className="ml-2 font-mono text-[0.66rem] text-volt">
+                            {s.evidence.length > 0 ? `[${String(s.evidence.length).padStart(2, "0")}]` : "[CERT]"}
                           </span>
                         </button>
                       </li>
@@ -174,7 +195,7 @@ export function SkillsMap() {
           </div>
 
           <div className="relative z-10">
-            <h3 className="eyebrow mb-3">Evidence</h3>
+            <h3 className="eyebrow mb-3 font-mono text-[0.72rem] tracking-wider text-paper-faint">Evidence Index</h3>
             <ul className="space-y-2">
               {sourceIds.map((src) => {
                 const linked = isLinked(src.id);
@@ -184,18 +205,18 @@ export function SkillsMap() {
                   <>
                     <span className="flex items-baseline justify-between gap-3">
                       <span
-                        className={`font-sans text-[0.9rem] transition-colors ${
+                        className={`font-sans text-[0.88rem] font-medium transition-colors ${
                           linked ? "text-paper" : "text-paper-muted"
                         }`}
                       >
                         {src.label}
                       </span>
-                      <span className="text-[0.68rem] text-paper-faint">
+                      <span className="font-mono text-[0.68rem] text-paper-faint">
                         {load === 1 ? "1 skill" : `${load} skills`}
                       </span>
                     </span>
-                    <span className="mt-1 block text-[0.7rem] uppercase tracking-label text-paper-faint">
-                      {src.kind}
+                    <span className="mt-1 block font-mono text-[0.68rem] uppercase tracking-wider text-paper-faint">
+                      [{src.kind}]
                     </span>
                   </>
                 );
@@ -206,7 +227,7 @@ export function SkillsMap() {
                       ref={(el) => {
                         sourceRefs.current[src.id] = el;
                       }}
-                      className={`rounded-xl border px-4 py-3 transition-[opacity,border-color,background-color] duration-300 ${
+                      className={`rounded-sm border px-4 py-2.5 transition-[opacity,border-color,background-color] duration-300 ${
                         linked
                           ? "border-volt/50 bg-volt/[0.08] opacity-100"
                           : active
@@ -240,8 +261,8 @@ export function SkillsMap() {
           : ""}
       </div>
 
-      <div className="mt-8 rounded-xl border border-[var(--line)] bg-ink-raised/70 px-5 py-4">
-        <p className="font-sans text-[0.95rem] text-paper">
+      <div className="mt-8 rounded-sm border border-[var(--line-strong)] bg-ink-raised/80 px-5 py-4">
+        <p className="font-sans text-[0.95rem] font-semibold text-paper">
           {active ? active.name : "Trace a skill"}
         </p>
         <p className="mt-1 min-h-[1.4rem] max-w-[72ch] text-[0.82rem] leading-relaxed text-paper-muted">
@@ -261,12 +282,12 @@ export function SkillsMap() {
                     {href ? (
                       <Link
                         href={href}
-                        className="rounded-full border border-volt/40 px-3 py-1 text-[0.76rem] text-volt-soft hover:bg-volt/10"
+                        className="rounded-sm border border-volt/40 px-3 py-1 font-mono text-[0.72rem] text-volt-soft hover:bg-volt/10"
                       >
                         {src.label}
                       </Link>
                     ) : (
-                      <span className="rounded-full border border-[var(--line-strong)] px-3 py-1 text-[0.76rem] text-paper-muted">
+                      <span className="rounded-sm border border-[var(--line-strong)] px-3 py-1 font-mono text-[0.72rem] text-paper-muted">
                         {src.label}
                       </span>
                     )}
@@ -274,12 +295,12 @@ export function SkillsMap() {
                 );
               })
             ) : (
-              <li className="rounded-full border border-dashed border-[var(--line-strong)] px-3 py-1 text-[0.76rem] text-paper-faint">
+              <li className="rounded-sm border border-dashed border-[var(--line-strong)] px-3 py-1 font-mono text-[0.72rem] text-paper-faint">
                 No project evidence yet
               </li>
             )
           ) : (
-            <li className="rounded-full border border-dashed border-[var(--line)] px-3 py-1 text-[0.76rem] text-paper-faint">
+            <li className="rounded-sm border border-dashed border-[var(--line)] px-3 py-1 font-mono text-[0.72rem] text-paper-faint">
               Nothing selected
             </li>
           )}

@@ -42,7 +42,19 @@ export function Reveal({
     if (!node) return;
     const io = shared();
     io.observe(node);
-    return () => io.unobserve(node);
+
+    // Fail-safe: ensure elements never remain invisible if IO is delayed or unsupported
+    const timer = setTimeout(() => {
+      if (node.getAttribute("data-reveal") !== "shown") {
+        node.setAttribute("data-reveal", "shown");
+        io.unobserve(node);
+      }
+    }, 2000);
+
+    return () => {
+      clearTimeout(timer);
+      io.unobserve(node);
+    };
   }, []);
 
   return (

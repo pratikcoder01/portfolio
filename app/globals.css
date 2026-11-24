@@ -3,21 +3,24 @@
 @tailwind utilities;
 
 @layer base {
-  /* Every colour is a channel triplet so Tailwind alpha modifiers
-     (bg-ink-card/45, border-volt/40 …) resolve per theme. Never hardcode a hex
-     in a component — add a token instead. */
+  /* ============================================================
+     Disciplined 90-9-1 Monochrome & Signal Orange Palette
+     90% Monochrome canvas/ink · 9% Structural lines · 1% Signal Orange
+     ============================================================ */
   :root,
   [data-theme="dark"] {
-    --ink-rgb: 8 9 13;
-    --ink-raised-rgb: 13 15 22;
-    --ink-card-rgb: 17 20 32;
-    --paper-rgb: 236 238 245;
-    --paper-muted-rgb: 164 171 191;
-    --paper-faint-rgb: 118 126 150;
-    --volt-rgb: 124 140 255;
-    --volt-soft-rgb: 169 180 255;
-    --volt-deep-rgb: 79 95 212;
-    --danger-rgb: 255 179 192;
+    --ink-rgb: 10 11 14;              /* #0A0B0E Deep blueprint slate */
+    --ink-raised-rgb: 16 18 23;       /* #101217 Raised surface */
+    --ink-card-rgb: 21 24 31;         /* #15181F Panel surface */
+    --paper-rgb: 244 246 250;         /* #F4F6FA High contrast text */
+    --paper-muted-rgb: 156 164 179;   /* #9CA4B3 Secondary text */
+    --paper-faint-rgb: 100 108 125;   /* #646C7D Tertiary metadata */
+    
+    /* International Signal Orange (#FF4F00) */
+    --volt-rgb: 255 79 0;
+    --volt-soft-rgb: 255 119 56;
+    --volt-deep-rgb: 204 63 0;
+    --danger-rgb: 255 107 107;
 
     --bg: rgb(var(--ink-rgb));
     --bg-raised: rgb(var(--ink-raised-rgb));
@@ -26,32 +29,34 @@
     --fg-muted: rgb(var(--paper-muted-rgb));
     --fg-faint: rgb(var(--paper-faint-rgb));
     --volt: rgb(var(--volt-rgb));
-    --on-accent: #08090d;
+    --on-accent: #ffffff;
     --danger: rgb(var(--danger-rgb));
 
-    --line: rgba(255, 255, 255, 0.09);
+    --line: rgba(255, 255, 255, 0.08);
     --line-strong: rgba(255, 255, 255, 0.16);
-    --glow: rgba(124, 140, 255, 0.16);
-    --grid: rgba(255, 255, 255, 0.028);
+    --grid: rgba(255, 255, 255, 0.035);
 
     color-scheme: dark;
   }
 
   [data-theme="light"] {
-    --ink-rgb: 246 246 249;
-    --ink-raised-rgb: 255 255 255;
-    --ink-card-rgb: 255 255 255;
-    --paper-rgb: 18 20 27;
-    --paper-muted-rgb: 75 81 98;
-    --paper-faint-rgb: 95 102 117;
-    --volt-rgb: 79 95 212;
-    --volt-soft-rgb: 58 73 189;
-    --volt-deep-rgb: 43 56 158;
-    --danger-rgb: 179 38 30;
+    --ink-rgb: 248 249 250;           /* #F8F9FA Technical paper */
+    --ink-raised-rgb: 255 255 255;    /* #FFFFFF Clean pure card */
+    --ink-card-rgb: 255 255 255;      /* #FFFFFF */
+    --paper-rgb: 15 17 21;            /* #0F1115 Primary black */
+    --paper-muted-rgb: 75 82 95;      /* #4B525F Secondary text */
+    --paper-faint-rgb: 108 115 130;   /* #6C7382 Metadata */
+    
+    /* Deep Vermilion Signal Orange for WCAG 2.1 AA Contrast (> 5.2:1) */
+    --volt-rgb: 220 53 0;             /* #DC3500 */
+    --volt-soft-rgb: 196 48 0;
+    --volt-deep-rgb: 160 38 0;
+    --danger-rgb: 185 28 28;
 
     --on-accent: #ffffff;
-    --grid: rgba(18, 22, 38, 0.05);
-    --glow: rgba(79, 95, 212, 0.1);
+    --grid: rgba(15, 17, 21, 0.04);
+    --line: rgba(0, 0, 0, 0.08);
+    --line-strong: rgba(0, 0, 0, 0.16);
 
     color-scheme: light;
   }
@@ -79,17 +84,16 @@
     background-color: var(--bg);
     color: var(--fg);
     font-family: theme(fontFamily.body);
-    /* Fine engineering-grid texture + one controlled glow. Painted once, fixed. */
+    /* Strict technical blueprint coordinate grid: crisp 1px orthogonal lines */
     background-image:
       linear-gradient(to right, var(--grid) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--grid) 1px, transparent 1px),
-      radial-gradient(70rem 42rem at 78% -8%, var(--glow), transparent 70%);
-    background-size: 72px 72px, 72px 72px, 100% 100%;
-    background-attachment: fixed, fixed, fixed;
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    background-attachment: fixed;
     overflow-x: hidden;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    transition: background-color 0.35s ease, color 0.35s ease;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
   h1,
@@ -101,19 +105,18 @@
   }
 
   ::selection {
-    background: rgb(var(--volt-rgb) / 0.28);
+    background: rgb(var(--volt-rgb) / 0.22);
     color: var(--fg);
   }
 
   :focus-visible {
     outline: 2px solid var(--volt);
-    outline-offset: 3px;
-    border-radius: 2px;
+    outline-offset: 2px;
+    border-radius: 1px;
   }
 
-  /* Anchored sections must not hide under the sticky nav. */
   section[id] {
-    scroll-margin-top: 6.5rem;
+    scroll-margin-top: 5.5rem;
   }
 
   input,
@@ -126,11 +129,11 @@
 
 @layer components {
   .shell {
-    @apply mx-auto w-full max-w-shell px-5 sm:px-8;
+    @apply mx-auto w-full max-w-shell px-4 sm:px-6 lg:px-8;
   }
 
   .eyebrow {
-    @apply font-sans text-[0.6875rem] uppercase tracking-label text-paper-faint;
+    @apply font-mono text-[0.7rem] uppercase tracking-wider text-paper-faint;
   }
 
   .rule {
@@ -138,12 +141,16 @@
   }
 
   .link-quiet {
-    @apply text-paper-muted transition-colors duration-200 hover:text-paper;
+    @apply text-paper-muted transition-colors duration-150 hover:text-paper;
   }
 
-  /* Underline that animates in; used for inline prose links. */
   .link-underline {
     @apply relative text-volt underline decoration-[var(--line-strong)] underline-offset-4 transition-colors hover:decoration-volt;
+  }
+
+  /* Micro-rounded or sharp structural container standard */
+  .technical-panel {
+    @apply border border-[var(--line)] bg-ink-raised/80 rounded-sm;
   }
 }
 
@@ -153,31 +160,23 @@
   }
 
   .skip-link:focus-visible {
-    @apply not-sr-only fixed left-4 top-4 z-[100] rounded-lg border border-volt/40 bg-ink-raised px-4 py-2 font-sans text-sm text-paper shadow-lg;
+    @apply not-sr-only fixed left-4 top-4 z-[100] rounded-sm border border-volt bg-ink-raised px-4 py-2 font-mono text-xs text-paper shadow-md;
   }
 
   .text-balance {
     text-wrap: balance;
   }
 
-  .no-overflow-x {
-    overflow-x: clip;
-  }
-
-  /* Off-screen diagrams are skipped entirely: no layout, paint, or running
-     stroke animation until they come into view. */
   .skip-offscreen {
     content-visibility: auto;
     contain-intrinsic-size: auto 20rem;
   }
 }
 
-/* Hero entrance. Deliberately transform-only and CSS-driven: an opacity:0 start
-   would keep the largest hero text out of the LCP until JavaScript finished,
-   and it left the sentence invisible for anyone whose JS failed to load. */
+/* Entrance animations: CSS-driven without render-blocking opacity gates */
 @keyframes rise-in {
   from {
-    transform: translate3d(0, var(--rise, 14px), 0);
+    transform: translate3d(0, var(--rise, 12px), 0);
   }
   to {
     transform: none;
@@ -186,38 +185,36 @@
 
 @keyframes word-rise {
   from {
-    transform: translate3d(0, 108%, 0);
+    transform: translate3d(0, 104%, 0);
   }
   to {
     transform: translate3d(0, 0, 0);
   }
 }
 
-/* Below-the-fold section reveals, driven by one shared IntersectionObserver. */
 [data-reveal] {
-  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .rise-in {
-    animation: rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-delay: var(--d, 0s);
   }
 
   .word-rise {
-    animation: word-rise 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: word-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-delay: var(--d, 0s);
   }
 
   [data-reveal="pending"] {
     opacity: 0;
-    transform: translate3d(0, 18px, 0);
+    transform: translate3d(0, 12px, 0);
   }
 }
 
-/* Theme switch icon swap: markup stays identical for both palettes so the
-   pre-paint theme script cannot cause a hydration mismatch. */
+/* Theme switch icon display */
 .theme-icon-sun {
   display: none;
 }
@@ -230,46 +227,17 @@
   display: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .theme-icon-moon,
-  .theme-icon-sun {
-    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-}
-
-/* Hairline tick marks used behind section headers. */
+/* Technical schematic hairline mark */
 .ticks {
   background-image: repeating-linear-gradient(
     to right,
-    var(--line) 0 1px,
-    transparent 1px 12px
+    var(--line-strong) 0 1px,
+    transparent 1px 8px
   );
-  height: 6px;
+  height: 4px;
 }
 
-/* Architecture diagrams: signal travelling along documented connections. */
-@keyframes dashflow {
-  to {
-    stroke-dashoffset: -32;
-  }
-}
-
-.flow-edge {
-  stroke-dasharray: 4 5;
-  animation: dashflow 2.4s linear infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .flow-edge {
-    animation: none;
-  }
-}
-
-/* ============================================================
-   Tactile Surface - clean, high-craft project cards.
-   Crisp 1px border, smooth hover elevation, and refined typography.
-   ============================================================ */
-
+/* Flat tactile card styling */
 .tilt-root {
   display: block;
 }
@@ -282,17 +250,14 @@
 .tilt-card {
   position: relative;
   height: 100%;
-  border-radius: 1rem;
+  border-radius: 0.25rem;
 }
 
-/* ============================================================
-   Portrait Frame — clean human developer photo presentation.
-   ============================================================ */
-
+/* Portrait frame: crisp blueprint border with zero sci-fi scan lines */
 .portrait-frame {
-  box-shadow: 0 10px 30px -15px rgb(0 0 0 / 0.3);
+  box-shadow: 0 4px 16px -8px rgba(0, 0, 0, 0.35);
 }
 
 [data-theme="light"] .portrait-frame {
-  box-shadow: 0 10px 25px -15px rgb(18 20 27 / 0.15);
+  box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.08);
 }

@@ -64,10 +64,10 @@ export function Hero() {
           </div>
 
           <div className="lg:col-start-1 lg:row-start-1">
-            <p className="eyebrow rise-in flex flex-wrap items-center gap-x-3 gap-y-1" style={delay(0)}>
+            <p className="eyebrow rise-in flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[0.74rem] uppercase tracking-wider text-paper-muted" style={delay(0)}>
               <span>{profile.location}</span>
               <span className="h-px w-6 bg-[var(--line-strong)]" aria-hidden="true" />
-              <span>{profile.kicker}</span>
+              <span className="text-volt">{profile.kicker}</span>
             </p>
 
             <Headline />
@@ -83,7 +83,7 @@ export function Hero() {
               <Magnetic strength={0.22}>
                 <a
                   href="#work"
-                  className="inline-flex items-center gap-2 rounded-full bg-volt px-5 py-2.5 font-sans text-[0.88rem] font-medium text-[var(--on-accent)] transition-shadow hover:shadow-[0_0_0_4px_rgb(var(--volt-rgb)/0.22)]"
+                  className="inline-flex items-center gap-2 rounded-sm bg-volt px-5 py-2.5 font-mono text-[0.82rem] font-semibold uppercase tracking-wider text-[var(--on-accent)] transition-all hover:brightness-110 hover:shadow-[0_0_0_2px_rgb(var(--volt-rgb)/0.4)]"
                 >
                   Selected work
                   <ArrowDownRight className="h-4 w-4" aria-hidden="true" />
@@ -93,7 +93,7 @@ export function Hero() {
               <Magnetic strength={0.18}>
                 <a
                   href="#contact"
-                  className="inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] px-5 py-2.5 font-sans text-[0.88rem] text-paper transition-colors hover:border-volt/60 hover:bg-volt/10"
+                  className="inline-flex items-center gap-2 rounded-sm border border-[var(--line-strong)] bg-ink-raised/60 px-5 py-2.5 font-mono text-[0.82rem] uppercase tracking-wider text-paper transition-colors hover:border-volt/60 hover:bg-volt/10"
                 >
                   Get in touch
                   <ArrowUpRight className="h-4 w-4 text-volt" aria-hidden="true" />
@@ -107,7 +107,7 @@ export function Hero() {
                     href={s.href}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="inline-flex items-center gap-1.5 rounded-full border border-transparent px-2.5 py-2 text-[0.8rem] text-paper-muted transition-colors hover:border-[var(--line)] hover:text-paper"
+                    className="inline-flex items-center gap-1.5 rounded-sm border border-transparent px-2.5 py-1.5 font-mono text-[0.76rem] text-paper-muted transition-colors hover:border-[var(--line)] hover:text-paper"
                   >
                     {s.label}
                     <span className="sr-only">{` - ${s.handle} on ${s.label}, opens in a new tab`}</span>
@@ -118,11 +118,11 @@ export function Hero() {
           </div>
         </div>
 
-        <dl className="rise-in mt-14 grid gap-px overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--line)] sm:grid-cols-2 lg:grid-cols-4" style={delay(0.66)}>
+        <dl className="rise-in mt-14 grid gap-px overflow-hidden rounded-sm border border-[var(--line-strong)] bg-[var(--line-strong)] sm:grid-cols-2 lg:grid-cols-4" style={delay(0.66)}>
           {facts.map((f) => (
             <div key={f.value} className="bg-ink-raised px-5 py-4">
-              <dt className="font-sans text-[1.05rem] font-medium text-paper">{f.value}</dt>
-              <dd className="mt-1 text-[0.78rem] leading-snug text-paper-faint">{f.label}</dd>
+              <dt className="font-mono text-[1.12rem] font-semibold tracking-tight text-paper">{f.value}</dt>
+              <dd className="mt-1 font-mono text-[0.72rem] uppercase tracking-wider text-paper-faint">{f.label}</dd>
             </div>
           ))}
         </dl>

@@ -16,7 +16,7 @@ export function TiltSurface({
 }) {
   return (
     <div
-      className={`tilt-root group h-full rounded-2xl transition-transform duration-300 ease-out hover:-translate-y-1 ${className}`}
+      className={`tilt-root group h-full rounded-sm transition-transform duration-300 ease-out hover:-translate-y-1 ${className}`}
       data-engaged="false"
       data-settled="true"
     >

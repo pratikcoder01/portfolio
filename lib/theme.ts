@@ -4,8 +4,8 @@ export type Theme = "dark" | "light";
 export const THEME_STORAGE_KEY = "pn-theme";
 
 export const THEME_COLORS: Record<Theme, string> = {
-  dark: "#08090d",
-  light: "#f6f6f9",
+  dark: "#0a0b0e",
+  light: "#f8f9fa",
 };
 
 /**

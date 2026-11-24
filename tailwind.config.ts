@@ -10,13 +10,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      // Channel triplets defined in app/globals.css, one set per theme.
       colors: {
         ink: {
           DEFAULT: withAlpha("--ink-rgb"),
           raised: withAlpha("--ink-raised-rgb"),
           card: withAlpha("--ink-card-rgb"),
-          line: "#23283a",
         },
         paper: {
           DEFAULT: withAlpha("--paper-rgb"),
@@ -31,18 +29,35 @@ const config: Config = {
         danger: withAlpha("--danger-rgb"),
       },
       fontFamily: {
-        sans: ["var(--font-grotesk)", "ui-sans-serif", "system-ui", "sans-serif"],
-        body: ["var(--font-body)", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ["var(--font-grotesk)", "Inter", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        body: ["var(--font-body)", "Inter", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        mono: [
+          "ui-monospace",
+          "SFMono-Regular",
+          "JetBrains Mono",
+          "Menlo",
+          "Consolas",
+          "monospace",
+        ],
+      },
+      borderRadius: {
+        none: "0px",
+        sm: "2px",
+        DEFAULT: "4px",
+        md: "6px",
+        lg: "8px",
+        xl: "12px",
       },
       maxWidth: {
-        shell: "76rem",
+        shell: "78rem",
       },
       letterSpacing: {
-        display: "-0.03em",
-        label: "0.18em",
+        display: "-0.025em",
+        tight: "-0.015em",
+        mono: "0.04em",
       },
       transitionTimingFunction: {
-        editorial: "cubic-bezier(0.22, 1, 0.36, 1)",
+        editorial: "cubic-bezier(0.16, 1, 0.3, 1)",
       },
     },
   },

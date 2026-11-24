@@ -55,11 +55,11 @@ export function SiteNav() {
           href="/"
           className="group flex items-baseline gap-2 font-sans text-[0.95rem] font-medium tracking-tight text-paper"
         >
-          <span className="grid h-6 w-6 place-items-center rounded-[6px] border border-volt/45 font-sans text-[0.7rem] text-volt">
+          <span className="grid h-6 w-6 place-items-center rounded-sm border border-volt/60 font-mono text-[0.7rem] font-semibold text-volt">
             PN
           </span>
-          <span>{profile.name}</span>
-          <span className="hidden text-[0.75rem] text-paper-faint sm:inline">
+          <span className="font-semibold">{profile.name}</span>
+          <span className="hidden font-mono text-[0.72rem] text-paper-faint sm:inline">
             / {profile.title}
           </span>
         </Link>
@@ -72,7 +72,7 @@ export function SiteNav() {
                 <li key={s.id} onMouseEnter={() => setHovered(s.id)} onMouseLeave={() => setHovered(null)}>
                   <Link
                     href={hrefFor(s.id)}
-                    className="relative block px-3 py-2 text-[0.82rem] text-paper-muted transition-colors hover:text-paper"
+                    className="relative block px-3 py-2 font-mono text-[0.76rem] uppercase tracking-wider text-paper-muted transition-colors hover:text-paper"
                     aria-current={active === s.id ? "location" : undefined}
                   >
                     {s.label}
@@ -97,7 +97,7 @@ export function SiteNav() {
           <Magnetic className="ml-3">
             <a
               href={email ? `mailto:${email}` : hrefFor("contact")}
-              className="group inline-flex items-center gap-1.5 rounded-full border border-[var(--line-strong)] px-4 py-2 font-sans text-[0.82rem] text-paper transition-colors hover:border-volt/60 hover:bg-volt/10"
+              className="group inline-flex items-center gap-1.5 rounded-sm border border-[var(--line-strong)] bg-ink-raised/60 px-3.5 py-1.5 font-mono text-[0.76rem] uppercase tracking-wider text-paper transition-colors hover:border-volt/60 hover:bg-volt/10"
             >
               Get in touch
               <ArrowUpRight className="h-3.5 w-3.5 text-volt" aria-hidden="true" />
@@ -112,7 +112,7 @@ export function SiteNav() {
 
           <button
             type="button"
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] px-3 py-2 font-sans text-[0.8rem] text-paper md:hidden"
+            className="inline-flex items-center gap-2 rounded-sm border border-[var(--line-strong)] px-3 py-1.5 font-mono text-[0.76rem] uppercase tracking-wider text-paper md:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             onClick={() => setOpen((v) => !v)}

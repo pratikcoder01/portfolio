@@ -15,10 +15,10 @@ function SectionBlock({ project, section }: { project: Project; section: CaseSec
       aria-labelledby={`${section.id}-heading`}
     >
       <div className="flex items-baseline gap-3">
-        <span className="font-sans text-[0.7rem] tracking-label text-paper-faint" aria-hidden="true">
-          {String(section.id).slice(0, 2).toUpperCase()}
+        <span className="font-mono text-[0.72rem] font-semibold tracking-wider text-volt" aria-hidden="true">
+          [{String(section.id).slice(0, 3).toUpperCase()}]
         </span>
-        <h2 id={`${section.id}-heading`} className="font-sans text-[1.25rem] font-medium sm:text-[1.45rem]">
+        <h2 id={`${section.id}-heading`} className="font-sans text-[1.25rem] font-semibold sm:text-[1.45rem]">
           {section.title}
         </h2>
       </div>
@@ -31,14 +31,14 @@ function SectionBlock({ project, section }: { project: Project; section: CaseSec
         ))}
 
         {Diagram && (
-          <figure className="my-6 rounded-2xl border border-[var(--line)] bg-ink-card/45 px-4 py-5 sm:px-6">
+          <figure className="my-6 rounded-sm border border-[var(--line-strong)] bg-ink-card/60 px-4 py-5 sm:px-6">
             <div className="skip-offscreen overflow-x-auto">
               <div className="min-w-[30rem]">
                 <Diagram />
               </div>
             </div>
-            <figcaption className="mt-3 text-[0.74rem] leading-relaxed text-paper-faint">
-              System architecture and component interactions.
+            <figcaption className="mt-3 font-mono text-[0.72rem] uppercase tracking-wider text-paper-faint">
+              System architecture schematic and data flow
             </figcaption>
           </figure>
         )}
@@ -46,7 +46,7 @@ function SectionBlock({ project, section }: { project: Project; section: CaseSec
         {section.bullets && (
           <ul className="space-y-2">
             {section.bullets.map((b) => (
-              <li key={b} className="flex gap-3 text-[0.9rem] leading-relaxed text-paper-muted">
+              <li key={b} className="flex gap-3 text-[0.88rem] leading-relaxed text-paper-muted">
                 <span
                   className="mt-[0.55rem] h-1 w-1 shrink-0 rounded-full bg-volt"
                   aria-hidden="true"
@@ -67,7 +67,7 @@ export function CaseStudy({ project }: { project: Project }) {
   return (
     <div className="shell py-14 sm:py-20">
       <nav aria-label="Breadcrumb" className="mb-8">
-        <ol className="flex flex-wrap items-center gap-2 text-[0.78rem] text-paper-faint">
+        <ol className="flex flex-wrap items-center gap-2 font-mono text-[0.74rem] uppercase tracking-wider text-paper-faint">
           <li>
             <Link href="/" className="link-quiet">
               Home
@@ -80,22 +80,22 @@ export function CaseStudy({ project }: { project: Project }) {
             </Link>
           </li>
           <li aria-hidden="true">/</li>
-          <li className="text-paper-muted" aria-current="page">
+          <li className="text-volt" aria-current="page">
             {project.name}
           </li>
         </ol>
       </nav>
 
       <header className="border-b border-[var(--line)] pb-8">
-        <p className="eyebrow">Case Study</p>
-        <h1 className="mt-3 font-sans text-[1.9rem] font-medium leading-tight sm:text-[2.6rem]">
+        <p className="eyebrow font-mono text-[0.72rem] uppercase tracking-wider text-paper-faint">Technical Case Study</p>
+        <h1 className="mt-3 font-sans text-[1.9rem] font-semibold leading-tight sm:text-[2.6rem]">
           {project.name}
         </h1>
         <p className="mt-4 max-w-[68ch] text-[1rem] leading-relaxed text-paper-muted">
           {project.tagline}
         </p>
 
-        <dl className="mt-7 grid gap-px overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--line)] sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="mt-7 grid gap-px overflow-hidden rounded-sm border border-[var(--line-strong)] bg-[var(--line-strong)] sm:grid-cols-2 lg:grid-cols-4">
           {[
             { term: "Role", detail: project.role },
             { term: "Period", detail: project.period },
@@ -103,8 +103,8 @@ export function CaseStudy({ project }: { project: Project }) {
             { term: "Focus", detail: "Architecture & Implementation" },
           ].map((cell) => (
             <div key={cell.term} className="bg-ink-raised px-4 py-3">
-              <dt className="text-[0.68rem] uppercase tracking-label text-paper-faint">{cell.term}</dt>
-              <dd className="mt-1 text-[0.84rem] leading-snug text-paper-muted">{cell.detail}</dd>
+              <dt className="font-mono text-[0.68rem] uppercase tracking-wider text-paper-faint">{cell.term}</dt>
+              <dd className="mt-1 font-mono text-[0.82rem] leading-snug text-paper-muted">{cell.detail}</dd>
             </div>
           ))}
         </dl>
@@ -115,7 +115,7 @@ export function CaseStudy({ project }: { project: Project }) {
               href={project.repo}
               target="_blank"
               rel="noreferrer noopener"
-              className="inline-flex items-center gap-2 rounded-full bg-volt px-4 py-2 font-sans text-[0.84rem] font-medium text-[var(--on-accent)]"
+              className="inline-flex items-center gap-2 rounded-sm bg-volt px-4 py-2 font-mono text-[0.78rem] font-semibold uppercase tracking-wider text-[var(--on-accent)] transition-all hover:brightness-110"
             >
               <GitBranch className="h-4 w-4" aria-hidden="true" />
               Open repository
@@ -124,18 +124,18 @@ export function CaseStudy({ project }: { project: Project }) {
           )}
           <Link
             href="/#work"
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] px-4 py-2 font-sans text-[0.84rem] text-paper-muted transition-colors hover:border-volt/60 hover:text-paper"
+            className="inline-flex items-center gap-2 rounded-sm border border-[var(--line-strong)] bg-ink-raised/60 px-4 py-2 font-mono text-[0.78rem] uppercase tracking-wider text-paper transition-colors hover:border-volt/60 hover:text-paper"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             All projects
           </Link>
         </div>
 
-        <ul className="mt-8 flex flex-wrap gap-x-4 gap-y-2 text-[0.78rem]">
+        <ul className="mt-8 flex flex-wrap gap-x-4 gap-y-2 font-mono text-[0.74rem] uppercase tracking-wider">
           {visibleSections.map((s) => (
             <li key={s.id}>
-              <a href={`#${s.id}`} className="link-quiet capitalize">
-                {s.title}
+              <a href={`#${s.id}`} className="link-quiet">
+                [{s.title}]
               </a>
             </li>
           ))}
@@ -150,11 +150,13 @@ export function CaseStudy({ project }: { project: Project }) {
         </div>
 
         <aside className="hidden lg:block">
-          <div className="sticky top-24 rounded-xl border border-[var(--line)] bg-ink-raised/50 p-5">
-            <p className="eyebrow">Tech Stack</p>
-            <ul className="mt-3 space-y-1.5 text-[0.8rem] text-paper-muted">
+          <div className="sticky top-24 rounded-sm border border-[var(--line-strong)] bg-ink-raised/60 p-5">
+            <p className="eyebrow font-mono text-[0.72rem] uppercase tracking-wider text-paper-faint">Tech Stack</p>
+            <ul className="mt-3 space-y-1.5 font-mono text-[0.76rem] text-paper-muted">
               {project.stack.map((s) => (
-                <li key={s}>{s}</li>
+                <li key={s} className="rounded-sm border border-[var(--line)] bg-ink-card/40 px-2 py-1">
+                  {s}
+                </li>
               ))}
             </ul>
           </div>
@@ -162,8 +164,8 @@ export function CaseStudy({ project }: { project: Project }) {
       </div>
 
       {project.scopeNote && (
-        <p className="mt-10 max-w-[70ch] rounded-xl border border-[var(--line)] bg-ink-raised/50 px-5 py-4 text-[0.84rem] leading-relaxed text-paper-muted">
-          <span className="font-sans text-[0.7rem] uppercase tracking-label text-volt">Scope Note</span>
+        <p className="mt-10 max-w-[70ch] rounded-sm border border-[var(--line-strong)] bg-ink-raised/60 px-5 py-4 font-mono text-[0.78rem] leading-relaxed text-paper-muted">
+          <span className="font-mono text-[0.7rem] uppercase tracking-wider text-volt">Scope Note</span>
           <span className="mt-1.5 block">{project.scopeNote}</span>
         </p>
       )}
@@ -184,13 +186,13 @@ function ProjectNav({ slug }: { slug: string }) {
       {prev ? (
         <Link
           href={`/projects/${prev.slug}`}
-          className="group rounded-xl border border-[var(--line)] px-4 py-3.5 transition-colors hover:border-volt/50"
+          className="group rounded-sm border border-[var(--line-strong)] bg-ink-raised/40 px-4 py-3.5 transition-colors hover:border-volt/50"
         >
-          <span className="flex items-center gap-1.5 text-[0.72rem] uppercase tracking-label text-paper-faint">
+          <span className="flex items-center gap-1.5 font-mono text-[0.7rem] uppercase tracking-wider text-paper-faint">
             <ArrowLeft className="h-3.5 w-3.5 text-volt transition-transform group-hover:-translate-x-1" aria-hidden="true" />
             Previous case study
           </span>
-          <span className="mt-1.5 block font-sans text-[0.95rem] text-paper">{prev.name}</span>
+          <span className="mt-1.5 block font-sans text-[0.95rem] font-medium text-paper">{prev.name}</span>
         </Link>
       ) : (
         <span />
@@ -199,13 +201,13 @@ function ProjectNav({ slug }: { slug: string }) {
       {next ? (
         <Link
           href={`/projects/${next.slug}`}
-          className="group rounded-xl border border-[var(--line)] px-4 py-3.5 text-right transition-colors hover:border-volt/50"
+          className="group rounded-sm border border-[var(--line-strong)] bg-ink-raised/40 px-4 py-3.5 text-right transition-colors hover:border-volt/50"
         >
-          <span className="flex items-center justify-end gap-1.5 text-[0.72rem] uppercase tracking-label text-paper-faint">
+          <span className="flex items-center justify-end gap-1.5 font-mono text-[0.7rem] uppercase tracking-wider text-paper-faint">
             Next case study
             <ArrowRight className="h-3.5 w-3.5 text-volt transition-transform group-hover:translate-x-1" aria-hidden="true" />
           </span>
-          <span className="mt-1.5 block font-sans text-[0.95rem] text-paper">{next.name}</span>
+          <span className="mt-1.5 block font-sans text-[0.95rem] font-medium text-paper">{next.name}</span>
         </Link>
       ) : (
         <span />

@@ -342,7 +342,7 @@ const browser = await chromium.launch();
   }));
   ok(
     "theme: dark preference on first visit renders the dark palette",
-    initial.theme === "dark" && initial.bg === "rgb(8, 9, 13)" && initial.stored === null,
+    initial.theme === "dark" && initial.bg === "rgb(10, 11, 14)" && initial.stored === null,
     initial,
   );
 
@@ -351,7 +351,7 @@ const browser = await chromium.launch();
   // The palette cross-fades over 350ms; read it once the transition lands so
   // this check does not depend on frame scheduling.
   await page.waitForFunction(
-    () => getComputedStyle(document.body).backgroundColor === "rgb(246, 246, 249)",
+    () => getComputedStyle(document.body).backgroundColor === "rgb(248, 249, 250)",
     null,
     { timeout: 3000 },
   );
@@ -364,11 +364,11 @@ const browser = await chromium.launch();
     meta: document.querySelector('meta[name="theme-color"]')?.getAttribute("content"),
   }));
   ok("theme: toggle switches to light", switched.theme === "light", switched);
-  ok("theme: surfaces and text actually change", switched.bg === "rgb(246, 246, 249)" && switched.fg === "rgb(18, 20, 27)", {
+  ok("theme: surfaces and text actually change", switched.bg === "rgb(248, 249, 250)" && switched.fg === "rgb(15, 17, 21)", {
     bg: switched.bg,
     fg: switched.fg,
   });
-  ok("theme: accent token darkens for contrast on paper", switched.accent === "79 95 212", switched.accent);
+  ok("theme: accent token darkens for contrast on paper", switched.accent === "220 53 0", switched.accent);
   ok("theme: theme-color meta follows the palette", switched.meta === "#f6f6f9", switched.meta);
   ok("theme: choice is persisted to localStorage", switched.stored === "light", switched.stored);
   const announced = await page.getByRole("button", { name: "Switch to dark theme" }).first().count();
@@ -381,7 +381,7 @@ const browser = await chromium.launch();
   }));
   ok(
     "theme: reload keeps light even though the OS prefers dark",
-    afterReload.theme === "light" && afterReload.bg === "rgb(246, 246, 249)",
+    afterReload.theme === "light" && afterReload.bg === "rgb(248, 249, 250)",
     afterReload,
   );
 
@@ -390,7 +390,7 @@ const browser = await chromium.launch();
     accent: getComputedStyle(document.documentElement).getPropertyValue("--volt-rgb").trim(),
     meta: document.querySelector('meta[name="theme-color"]')?.getAttribute("content"),
   }));
-  ok("theme: accent token matches light palette", lightPalette.accent === "79 95 212", lightPalette);
+  ok("theme: accent token matches light palette", lightPalette.accent === "220 53 0", lightPalette);
 
   await toggle.click();
   await page.waitForTimeout(300);
@@ -502,7 +502,7 @@ const browser = await chromium.launch();
   }));
   ok(
     "theme: a light system preference starts light without any click",
-    lightFirst.theme === "light" && lightFirst.bg === "rgb(246, 246, 249)",
+    lightFirst.theme === "light" && lightFirst.bg === "rgb(248, 249, 250)",
     lightFirst,
   );
   await ctx.close();

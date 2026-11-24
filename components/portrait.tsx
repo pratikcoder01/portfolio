@@ -9,7 +9,7 @@ import { profile } from "@/lib/data";
 export function PortraitPlate({ className = "" }: { className?: string }) {
   return (
     <figure className={`portrait-plate flex items-center gap-4 lg:block lg:gap-0 ${className}`}>
-      <div className="portrait-frame relative w-20 shrink-0 overflow-hidden rounded-2xl border border-[var(--line-strong)] bg-ink-card shadow-sm sm:w-24 lg:w-full">
+      <div className="portrait-frame relative w-20 shrink-0 overflow-hidden rounded-sm border border-[var(--line-strong)] bg-ink-card shadow-sm sm:w-24 lg:w-full">
         <Image
           src="/portrait.png"
           alt={`Portrait of ${profile.name}`}
@@ -22,10 +22,10 @@ export function PortraitPlate({ className = "" }: { className?: string }) {
       </div>
 
       <figcaption className="min-w-0 lg:mt-3">
-        <p className="font-sans text-[0.95rem] font-medium leading-tight text-paper">{profile.name}</p>
-        <p className="mt-1 text-[0.78rem] leading-snug text-paper-muted">{profile.title}</p>
-        <p className="mt-2 hidden items-center gap-2 text-[0.7rem] text-paper-faint lg:flex">
-          <span className="h-px w-4 shrink-0 bg-[var(--line-strong)]" aria-hidden="true" />
+        <p className="font-sans text-[0.95rem] font-semibold leading-tight text-paper">{profile.name}</p>
+        <p className="mt-1 font-mono text-[0.74rem] leading-snug text-paper-muted">{profile.title}</p>
+        <p className="mt-2 hidden items-center gap-2 font-mono text-[0.68rem] uppercase tracking-wider text-paper-faint lg:flex">
+          <span className="h-1.5 w-1.5 rounded-full bg-volt" aria-hidden="true" />
           {profile.location}
         </p>
       </figcaption>

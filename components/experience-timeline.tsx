@@ -16,10 +16,10 @@ function Entry({ item, isFirst }: { item: ExperienceEntry; isFirst: boolean }) {
   return (
     <li className="relative pl-6 sm:pl-10">
       <span
-        className="absolute left-0 top-[1.15rem] h-2.5 w-2.5 -translate-x-1/2 rounded-full border border-volt/70 bg-ink"
+        className="absolute left-0 top-[1.25rem] h-2 w-2 -translate-x-1/2 rotate-45 border border-volt bg-ink"
         aria-hidden="true"
       />
-      <div className="rounded-xl border border-[var(--line)] bg-ink-raised/70 transition-colors hover:border-[var(--line-strong)]">
+      <div className="rounded-sm border border-[var(--line-strong)] bg-ink-raised/70 transition-colors hover:border-volt/50">
         <h3 className="m-0">
           <button
             type="button"
@@ -30,11 +30,11 @@ function Entry({ item, isFirst }: { item: ExperienceEntry; isFirst: boolean }) {
             className="flex w-full items-start justify-between gap-4 px-4 py-4 text-left sm:px-5"
           >
             <span className="min-w-0">
-              <span className="block font-sans text-[0.98rem] font-medium text-paper sm:text-[1.05rem]">
+              <span className="block font-sans text-[0.98rem] font-semibold text-paper sm:text-[1.05rem]">
                 {item.org}
               </span>
-              <span className="mt-1 block text-[0.86rem] text-volt-soft">{item.role}</span>
-              <span className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.75rem] text-paper-faint">
+              <span className="mt-1 block font-mono text-[0.82rem] font-medium text-volt">{item.role}</span>
+              <span className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[0.72rem] uppercase tracking-wider text-paper-faint">
                 <span>
                   {item.from} &rarr; {item.to}
                 </span>
@@ -62,7 +62,7 @@ function Entry({ item, isFirst }: { item: ExperienceEntry; isFirst: boolean }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.24 }}
-            className="border-t border-[var(--line)] px-4 pb-5 pt-4 sm:px-5"
+            className="border-t border-[var(--line-strong)] px-4 pb-5 pt-4 sm:px-5"
           >
             {item.summary && (
               <p className="mb-3 max-w-[70ch] text-[0.88rem] leading-relaxed text-paper-muted">
@@ -72,7 +72,7 @@ function Entry({ item, isFirst }: { item: ExperienceEntry; isFirst: boolean }) {
             {item.bullets.length > 0 && (
               <ul className="space-y-2.5">
                 {item.bullets.map((b) => (
-                  <li key={b} className="flex gap-3 text-[0.88rem] leading-relaxed text-paper-muted">
+                  <li key={b} className="flex gap-3 text-[0.85rem] leading-relaxed text-paper-muted">
                     <span className="mt-[0.55rem] h-1 w-1 shrink-0 rounded-full bg-volt" aria-hidden="true" />
                     <span className="max-w-[72ch]">{b}</span>
                   </li>
@@ -85,7 +85,7 @@ function Entry({ item, isFirst }: { item: ExperienceEntry; isFirst: boolean }) {
                 {item.tags.map((t) => (
                   <li
                     key={t}
-                    className="rounded-full border border-[var(--line-strong)] px-2.5 py-1 text-[0.72rem] text-paper-muted"
+                    className="rounded-sm border border-[var(--line)] bg-ink-card/60 px-2.5 py-0.5 font-mono text-[0.68rem] text-paper-muted"
                   >
                     {t}
                   </li>

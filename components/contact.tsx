@@ -39,8 +39,8 @@ function readAttempts(): number[] {
  */
 function DirectPanel({ email }: { email: string | null }) {
   return (
-    <div className="rounded-xl border border-[var(--line-strong)] bg-ink-card/45 p-6 sm:p-7">
-      <p className="eyebrow">Get in touch</p>
+    <div className="rounded-sm border border-[var(--line-strong)] bg-ink-card/60 p-6 sm:p-7">
+      <p className="eyebrow font-mono text-[0.72rem] uppercase tracking-wider text-paper-faint">Direct line</p>
       <p className="mt-3 max-w-[42ch] text-[0.95rem] leading-relaxed text-paper">
         {email
           ? "Feel free to reach out via email. I'm always open to discussing engineering opportunities, architectures, or collaborative projects."
@@ -52,7 +52,7 @@ function DirectPanel({ email }: { email: string | null }) {
           <Magnetic strength={0.2}>
             <a
               href={`mailto:${email}`}
-              className="inline-flex items-center gap-2 rounded-full bg-volt px-5 py-2.5 font-sans text-[0.88rem] font-medium text-[var(--on-accent)] transition-shadow hover:shadow-[0_0_0_4px_rgb(var(--volt-rgb)/0.22)]"
+              className="inline-flex items-center gap-2 rounded-sm bg-volt px-5 py-2.5 font-mono text-[0.82rem] font-semibold uppercase tracking-wider text-[var(--on-accent)] transition-all hover:brightness-110 hover:shadow-[0_0_0_2px_rgb(var(--volt-rgb)/0.4)]"
             >
               {email}
               <Send className="h-4 w-4" aria-hidden="true" />
@@ -66,7 +66,7 @@ function DirectPanel({ email }: { email: string | null }) {
               href={s.href}
               target="_blank"
               rel="noreferrer noopener"
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] px-5 py-2.5 font-sans text-[0.88rem] text-paper transition-colors hover:border-volt/60 hover:bg-volt/10"
+              className="inline-flex items-center gap-2 rounded-sm border border-[var(--line-strong)] bg-ink-raised/70 px-5 py-2.5 font-mono text-[0.82rem] uppercase tracking-wider text-paper transition-colors hover:border-volt/60 hover:bg-volt/10"
             >
               {s.label}
               <ArrowUpRight className="h-4 w-4 text-volt" aria-hidden="true" />
@@ -86,7 +86,7 @@ function DirectPanel({ email }: { email: string | null }) {
           href="/resume.pdf"
           download
           aria-label="Download resume (PDF)"
-          className="mt-5 inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] px-5 py-2.5 font-sans text-[0.88rem] text-paper transition-colors hover:border-volt/60 hover:bg-volt/10"
+          className="mt-5 inline-flex items-center gap-2 rounded-sm border border-[var(--line-strong)] bg-ink-raised/70 px-5 py-2.5 font-mono text-[0.82rem] uppercase tracking-wider text-paper transition-colors hover:border-volt/60 hover:bg-volt/10"
         >
           <Download className="h-4 w-4 text-volt" aria-hidden="true" />
           Download résumé
@@ -349,7 +349,7 @@ export function Contact() {
                   <button
                     type="submit"
                     disabled={status.kind === "sending"}
-                    className="inline-flex items-center gap-2 rounded-full bg-volt px-5 py-2.5 font-sans text-[0.88rem] font-medium text-[var(--on-accent)] transition-[opacity,box-shadow] hover:shadow-[0_0_0_4px_rgb(var(--volt-rgb)/0.22)] disabled:cursor-not-allowed disabled:opacity-45"
+                    className="inline-flex items-center gap-2 rounded-sm bg-volt px-5 py-2.5 font-mono text-[0.82rem] font-semibold uppercase tracking-wider text-[var(--on-accent)] transition-[opacity,box-shadow] hover:brightness-110 hover:shadow-[0_0_0_2px_rgb(var(--volt-rgb)/0.4)] disabled:cursor-not-allowed disabled:opacity-45"
                   >
                     {status.kind === "sending" ? "Sending" : "Send message"}
                     {status.kind !== "sending" && <Send className="h-4 w-4" aria-hidden="true" />}

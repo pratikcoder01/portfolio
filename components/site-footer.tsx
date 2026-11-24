@@ -62,14 +62,14 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-10 flex flex-col gap-3 border-t border-[var(--line)] pt-6 text-[0.75rem] text-paper-faint sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            Built with Next.js, TypeScript, and Tailwind CSS. Designed with editorial typography and accessible standards.
+          <p className="font-mono text-[0.72rem]">
+            Built with Next.js, TypeScript, and Tailwind CSS · Editorial Swiss &amp; Technical Blueprint
           </p>
           <a
             href="#main"
-            className="inline-flex items-center gap-1.5 rounded-full border border-[var(--line-strong)] px-3 py-1.5 transition-colors hover:border-volt/60 hover:text-paper"
+            className="inline-flex items-center gap-1.5 rounded-sm border border-[var(--line-strong)] bg-ink-raised/60 px-3 py-1.5 font-mono text-[0.72rem] uppercase tracking-wider transition-colors hover:border-volt/60 hover:text-paper"
           >
-            <ArrowUp className="h-3.5 w-3.5" aria-hidden="true" />
+            <ArrowUp className="h-3.5 w-3.5 text-volt" aria-hidden="true" />
             Back to top
           </a>
         </div>
