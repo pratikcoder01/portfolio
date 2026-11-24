@@ -75,13 +75,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme="dark" className={`${grotesk.variable} ${body.variable}`}>
+    <html
+      lang="en"
+      data-theme="dark"
+      className={`${grotesk.variable} ${body.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         {/* Decides the palette before the first paint so there is no flash of the
             wrong theme. The server always renders dark; the script may switch. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <noscript>
           <style>{"[data-reveal]{opacity:1 !important;transform:none !important}"}</style>
         </noscript>
