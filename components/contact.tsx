@@ -35,17 +35,16 @@ function readAttempts(): number[] {
 
 /**
  * DirectPanel — what the right column shows when no Formspree id is configured.
- * It is a finished contact block, not an error state: no form, and no mention of
- * environment variables, because a visitor has no idea what those are.
+ * Clear, conversational direct contact panel.
  */
 function DirectPanel({ email }: { email: string | null }) {
   return (
     <div className="rounded-xl border border-[var(--line-strong)] bg-ink-card/45 p-6 sm:p-7">
-      <p className="eyebrow">Direct line</p>
+      <p className="eyebrow">Get in touch</p>
       <p className="mt-3 max-w-[42ch] text-[0.95rem] leading-relaxed text-paper">
         {email
-          ? "Email works best - put the role or the problem in the first line and I will answer properly."
-          : "The fastest way to reach me is a message on GitHub or LinkedIn."}
+          ? "Feel free to reach out via email. I'm always open to discussing engineering opportunities, architectures, or collaborative projects."
+          : "The fastest way to reach me is a direct message on GitHub or LinkedIn."}
       </p>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -79,7 +78,7 @@ function DirectPanel({ email }: { email: string | null }) {
 
       <p className="mt-6 flex items-start gap-2 text-[0.78rem] leading-relaxed text-paper-faint">
         <span className="mt-2 h-px w-4 shrink-0 bg-[var(--line-strong)]" aria-hidden="true" />
-        A short brief beats a long one: what you need, by when, and what done looks like.
+        Always happy to chat about software engineering, system design, or internship roles.
       </p>
 
       {resumeExists && (
@@ -174,16 +173,13 @@ export function Contact() {
       });
 
       if (response.ok) {
-        // Wrap in try/catch: a storage failure (e.g. private-browsing quota,
-        // SecurityError) must never turn a successful send into an error state.
         try {
           window.localStorage.setItem(
             STORAGE_KEY,
             JSON.stringify([...readAttempts(), Date.now()]),
           );
         } catch {
-          // Storage unavailable — rate-limit tracking is skipped this round,
-          // but the message was sent successfully so we still show "Received".
+          // Storage unavailable
         }
         setCooldown(COOLDOWN_SECONDS);
         setValues({ name: "", email: "", message: "" });
@@ -237,16 +233,13 @@ export function Contact() {
       <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
         <Reveal>
           <h2 id="contact-heading" className="font-sans text-[1.6rem] font-medium sm:text-[2rem]">
-            Start a conversation
+            Get in touch
           </h2>
           <p className="mt-4 max-w-[46ch] text-[0.92rem] leading-relaxed text-paper-muted">
-            Roles where algorithmic thinking matters more than years of experience, a problem that
-            needs an owner, or a build you want a second pair of hands on.
+            Interested in discussing engineering roles, system architectures, or technical projects? Feel free to reach out.
           </p>
 
           <div className="mt-7 space-y-2 text-[0.86rem]">
-            {/* With no endpoint the panel on the right already makes the address the
-                primary action, so the left column does not repeat it. */}
             {endpoint &&
               (email ? (
                 <p>
@@ -256,7 +249,7 @@ export function Contact() {
                 </p>
               ) : (
                 <p className="max-w-[40ch] text-paper-muted">
-                  No public email address on this page - use GitHub or LinkedIn and I will see it.
+                  Reach me through GitHub or LinkedIn below.
                 </p>
               ))}
             <ul className="flex flex-wrap gap-x-5 gap-y-1 pt-1">

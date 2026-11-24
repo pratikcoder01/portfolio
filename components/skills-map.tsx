@@ -107,11 +107,10 @@ export function SkillsMap() {
       <div className="ticks mb-6 w-40 opacity-70" aria-hidden="true" />
       <Reveal>
         <h2 id="skills-heading" className="font-sans text-[1.6rem] font-medium sm:text-[2rem]">
-          Skills, with receipts
+          Technical Skills &amp; Experience
         </h2>
         <p className="mt-3 max-w-[64ch] text-[0.92rem] leading-relaxed text-paper-muted">
-          No percentage bars. A skill only appears here when a project, role or certification
-          documents it - hover, focus or tap a skill to trace the line to the work that proves it.
+          Core competencies mapped directly to shipped platforms, production features, and open-source contributions.
         </p>
       </Reveal>
 

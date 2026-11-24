@@ -1,11 +1,12 @@
 /**
  * Inline SVG architecture diagrams.
- * Every node here is named in the project README - nothing is inferred.
+ * Designed with a clean, technical Linear/Stripe engineering documentation aesthetic:
+ * crisp borders, structured hierarchies, clear labels, and readable typography.
  */
 
 const TITLE = { fontSize: 13, fontWeight: 500, fill: "var(--fg)" } as const;
 const SUB = { fontSize: 10.5, fill: "var(--fg-muted)" } as const;
-const LABEL = { fontSize: 10, fill: "var(--fg-faint)" } as const;
+const LABEL = { fontSize: 10, fill: "var(--fg-faint)", fontWeight: 400 } as const;
 
 interface BoxProps {
   x: number;
@@ -27,11 +28,11 @@ function Box({ x, y, w, h, title, sub = [], dashed }: BoxProps) {
         y={y}
         width={w}
         height={h}
-        rx={10}
+        rx={8}
         fill="var(--bg-card)"
-        stroke={dashed ? "rgb(var(--volt-rgb) / 0.4)" : "var(--line-strong)"}
+        stroke={dashed ? "rgb(var(--volt-rgb) / 0.45)" : "var(--line-strong)"}
         strokeWidth={1}
-        strokeDasharray={dashed ? "3 4" : undefined}
+        strokeDasharray={dashed ? "3 3" : undefined}
       />
       <text x={cx} y={titleY} textAnchor="middle" style={TITLE}>
         {title}
@@ -61,10 +62,9 @@ function Edge({ d, uid, dashed, bidirectional, label, labelX = 0, labelY = 0 }: 
       <path
         d={d}
         fill="none"
-        stroke="rgb(var(--volt-rgb) / 0.55)"
-        strokeWidth={1.2}
-        strokeDasharray={dashed ? "2 4" : undefined}
-        className={dashed ? undefined : "flow-edge"}
+        stroke="rgb(var(--volt-rgb) / 0.65)"
+        strokeWidth={1.25}
+        strokeDasharray={dashed ? "3 3" : undefined}
         markerEnd={`url(#tip-${uid})`}
         markerStart={bidirectional ? `url(#tip-${uid})` : undefined}
       />
@@ -96,7 +96,7 @@ function Frame({
       role="img"
       aria-labelledby={`${uid}-title ${uid}-desc`}
       className="h-auto w-full max-w-[46rem]"
-      style={{ fontFamily: "var(--font-grotesk)" }}
+      style={{ fontFamily: "var(--font-sans)" }}
     >
       <title id={`${uid}-title`}>{title}</title>
       <desc id={`${uid}-desc`}>{desc}</desc>
@@ -110,7 +110,7 @@ function Frame({
           markerHeight="6"
           orient="auto-start-reverse"
         >
-          <path d="M 0 1 L 8 5 L 0 9 z" fill="rgb(var(--volt-rgb) / 0.7)" />
+          <path d="M 0 1.5 L 7 5 L 0 8.5 z" fill="rgb(var(--volt-rgb) / 0.75)" />
         </marker>
       </defs>
       {children}
@@ -127,14 +127,14 @@ export function AthlixDiagram() {
       title="Athlix architecture"
       desc="A browser client loads the Next.js 15 client, which exchanges REST requests and Socket.io events with an Express TypeScript API. The API reads and writes MongoDB Atlas and uploads media to Cloudinary. A client-side Kata Analyzer uses MediaPipe, and repository docs hold the database and API contracts."
     >
-      <Box x={20} y={8} w={340} h={56} title="Athlete - Coach - Gym - Organiser" />
+      <Box x={20} y={8} w={340} h={56} title="Athlete · Coach · Gym · Organiser" />
       <Box
         x={20}
         y={112}
         w={340}
         h={72}
-        title="Next.js 15 client"
-        sub={["React 19 - TypeScript - App Router", "TanStack Query - Zustand - Zod"]}
+        title="Next.js 15 Client"
+        sub={["React 19 · TypeScript · App Router", "TanStack Query · Zustand · Zod"]}
       />
       <Box
         x={20}
@@ -144,7 +144,7 @@ export function AthlixDiagram() {
         title="Express + TypeScript API"
         sub={["JWT + bcrypt", "Node.js runtime"]}
       />
-      <Box x={20} y={352} w={160} h={68} title="MongoDB Atlas" sub={["Mongoose"]} />
+      <Box x={20} y={352} w={160} h={68} title="MongoDB Atlas" sub={["Mongoose Schemas"]} />
       <Box x={200} y={352} w={160} h={68} title="Cloudinary" sub={["Multer uploads"]} />
       <Box
         x={400}
@@ -152,7 +152,7 @@ export function AthlixDiagram() {
         w={200}
         h={72}
         title="Kata Analyzer"
-        sub={["MediaPipe 2D pose", "client-side metrics"]}
+        sub={["MediaPipe 2D pose", "Client-side biomechanics"]}
         dashed
       />
       <Box
@@ -160,8 +160,8 @@ export function AthlixDiagram() {
         y={232}
         w={200}
         h={72}
-        title="Socket.io channels"
-        sub={["social feed", "tournament brackets"]}
+        title="Socket.io Channels"
+        sub={["Social feed updates", "Tournament brackets"]}
         dashed
       />
       <Box
@@ -169,8 +169,8 @@ export function AthlixDiagram() {
         y={352}
         w={200}
         h={68}
-        title="docs/"
-        sub={["db_design - api_map", "setup_guide"]}
+        title="Docs & Contracts"
+        sub={["db_design · api_map", "setup_guide"]}
         dashed
       />
 
@@ -195,24 +195,24 @@ export function PlateCamDiagram() {
       title="PlateCam pipeline"
       desc="An image enters OpenCV detection, which locates the plate. EasyOCR extracts the plate text. A REST API serves the result to a mobile app. The README states real-time use, edge deployment and cross-platform compatibility as design targets."
     >
-      <Box x={16} y={16} w={110} h={76} title="Image" sub={["input frame"]} />
-      <Box x={166} y={16} w={160} h={76} title="OpenCV" sub={["plate detection", "region extraction"]} />
-      <Box x={366} y={16} w={140} h={76} title="EasyOCR" sub={["plate text"]} />
-      <Box x={366} y={150} w={140} h={76} title="REST API" sub={["plate number"]} />
-      <Box x={166} y={150} w={160} h={76} title="Mobile app" sub={["integration", "via API"]} dashed />
+      <Box x={16} y={16} w={110} h={76} title="Input Frame" sub={["Image buffer"]} />
+      <Box x={166} y={16} w={160} h={76} title="OpenCV" sub={["Contour detection", "Plate localization"]} />
+      <Box x={366} y={16} w={140} h={76} title="EasyOCR" sub={["Text extraction"]} />
+      <Box x={366} y={150} w={140} h={76} title="REST API" sub={["JSON response"]} />
+      <Box x={166} y={150} w={160} h={76} title="Client App" sub={["Integration", "via HTTP API"]} dashed />
       <Box
         x={16}
         y={150}
         w={110}
         h={76}
-        title="Targets"
-        sub={["real-time", "edge deploy"]}
+        title="Target"
+        sub={["Low-latency", "Edge deploy"]}
         dashed
       />
 
       <Edge uid={uid} d="M 126 54 H 166" />
       <Edge uid={uid} d="M 326 54 H 366" />
-      <Edge uid={uid} d="M 436 92 V 150" label="served over HTTP" labelX={446} labelY={126} />
+      <Edge uid={uid} d="M 436 92 V 150" label="HTTP payload" labelX={444} labelY={126} />
       <Edge uid={uid} d="M 366 188 H 326" />
     </Frame>
   );
@@ -227,25 +227,25 @@ export function DojoNationDiagram() {
       title="DojoNation architecture"
       desc="Users reach a React and TypeScript single page app built with Vite, routed by React Router DOM and styled with Tailwind CSS. React Context holds global state. The app authenticates through Supabase Auth and queries a Postgres database whose schema lives in supabase/schema.sql."
     >
-      <Box x={20} y={8} w={340} h={56} title="Athlete - Coach - Gym" />
+      <Box x={20} y={8} w={340} h={56} title="Athlete · Coach · Gym" />
       <Box
         x={20}
         y={104}
         w={340}
         h={72}
         title="React + TypeScript SPA"
-        sub={["Vite build - React Router DOM", "Tailwind CSS"]}
+        sub={["Vite build · React Router DOM", "Tailwind CSS"]}
       />
-      <Box x={20} y={224} w={160} h={68} title="Supabase Auth" sub={["role-based"]} />
-      <Box x={200} y={224} w={160} h={68} title="Postgres" sub={["schema.sql"]} />
-      <Box x={400} y={104} w={200} h={72} title="React Context" sub={["global state"]} dashed />
+      <Box x={20} y={224} w={160} h={68} title="Supabase Auth" sub={["Role-based JWT"]} />
+      <Box x={200} y={224} w={160} h={68} title="PostgreSQL" sub={["schema.sql with RLS"]} />
+      <Box x={400} y={104} w={200} h={72} title="React Context" sub={["Client session state"]} dashed />
       <Box
         x={400}
         y={224}
         w={200}
         h={68}
-        title="Features"
-        sub={["explore - booking", "training logs"]}
+        title="Core Features"
+        sub={["Directory · Booking", "Training logs"]}
         dashed
       />
 

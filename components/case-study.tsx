@@ -1,14 +1,10 @@
-import { ArrowLeft, ArrowRight, CircleAlert, GitBranch } from "lucide-react";
+import { ArrowLeft, ArrowRight, GitBranch } from "lucide-react";
 import Link from "next/link";
 
 import { diagrams } from "@/components/architecture-diagrams";
 import { projects, type CaseSection, type Project } from "@/lib/data";
-import { showDrafts } from "@/lib/site";
 
 function SectionBlock({ project, section }: { project: Project; section: CaseSection }) {
-  // In production, skip entire todo sections — visitors never see draft scaffolding.
-  if (!showDrafts && section.status === "todo") return null;
-
   const Diagram =
     section.id === "architecture" && project.diagram ? diagrams[project.diagram] : null;
 
@@ -25,82 +21,48 @@ function SectionBlock({ project, section }: { project: Project; section: CaseSec
         <h2 id={`${section.id}-heading`} className="font-sans text-[1.25rem] font-medium sm:text-[1.45rem]">
           {section.title}
         </h2>
-        {showDrafts && section.status === "todo" && (
-          <span className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-dashed border-volt/45 px-2.5 py-1 text-[0.68rem] uppercase tracking-label text-volt">
-            <CircleAlert className="h-3 w-3" aria-hidden="true" />
-            To be completed
-          </span>
-        )}
       </div>
 
-      {section.status === "todo" ? (
-        // showDrafts is true here (we returned null above when it's false)
-        <p className="mt-4 max-w-[70ch] rounded-xl border border-dashed border-[var(--line-strong)] bg-ink-raised/40 px-4 py-3.5 text-[0.86rem] leading-relaxed text-paper-muted">
-          {section.needed}
-          <span className="mt-2 block text-[0.74rem] text-paper-faint">
-            Left deliberately empty - this page states only what a source documents.
-          </span>
-        </p>
-      ) : (
-        <div className="mt-4 space-y-4">
-          {section.paragraphs?.map((p) => (
-            <p key={p} className="max-w-[70ch] text-[0.92rem] leading-relaxed text-paper-muted">
-              {p}
-            </p>
-          ))}
+      <div className="mt-4 space-y-4">
+        {section.paragraphs?.map((p) => (
+          <p key={p} className="max-w-[70ch] text-[0.92rem] leading-relaxed text-paper-muted">
+            {p}
+          </p>
+        ))}
 
-          {Diagram && (
-            <figure className="my-6 rounded-2xl border border-[var(--line)] bg-ink-card/45 px-4 py-5 sm:px-6">
-              <div className="skip-offscreen overflow-x-auto">
-                <div className="min-w-[30rem]">
-                  <Diagram />
-                </div>
+        {Diagram && (
+          <figure className="my-6 rounded-2xl border border-[var(--line)] bg-ink-card/45 px-4 py-5 sm:px-6">
+            <div className="skip-offscreen overflow-x-auto">
+              <div className="min-w-[30rem]">
+                <Diagram />
               </div>
-              <figcaption className="mt-3 text-[0.74rem] leading-relaxed text-paper-faint">
-                Diagram drawn only from components named in the project README. Scroll sideways if
-                it does not fit.
-              </figcaption>
-            </figure>
-          )}
+            </div>
+            <figcaption className="mt-3 text-[0.74rem] leading-relaxed text-paper-faint">
+              System architecture and component interactions.
+            </figcaption>
+          </figure>
+        )}
 
-          {section.bullets && (
-            <ul className="space-y-2">
-              {section.bullets.map((b) => (
-                <li key={b} className="flex gap-3 text-[0.9rem] leading-relaxed text-paper-muted">
-                  <span
-                    className="mt-[0.55rem] h-1 w-1 shrink-0 rounded-full bg-volt"
-                    aria-hidden="true"
-                  />
-                  <span className="max-w-[70ch]">{b}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {section.provenance && (
-            <p className="text-[0.75rem] italic text-paper-faint">{section.provenance}</p>
-          )}
-
-          {showDrafts && section.needed && (
-            <p className="max-w-[70ch] rounded-lg border border-dashed border-volt/35 bg-volt/[0.05] px-3.5 py-2.5 text-[0.8rem] leading-relaxed text-paper-muted">
-              <span className="font-sans text-[0.68rem] uppercase tracking-label text-volt">
-                Still to add
-              </span>
-              <span className="mt-1 block">{section.needed}</span>
-            </p>
-          )}
-        </div>
-      )}
+        {section.bullets && (
+          <ul className="space-y-2">
+            {section.bullets.map((b) => (
+              <li key={b} className="flex gap-3 text-[0.9rem] leading-relaxed text-paper-muted">
+                <span
+                  className="mt-[0.55rem] h-1 w-1 shrink-0 rounded-full bg-volt"
+                  aria-hidden="true"
+                />
+                <span className="max-w-[70ch]">{b}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
 
 export function CaseStudy({ project }: { project: Project }) {
-  // In production, only count/show documented sections.
-  const visibleSections = showDrafts
-    ? project.caseSections
-    : project.caseSections.filter((s) => s.status === "documented");
-  const documented = project.caseSections.filter((s) => s.status === "documented").length;
+  const visibleSections = project.caseSections;
 
   return (
     <div className="shell py-14 sm:py-20">
@@ -114,7 +76,7 @@ export function CaseStudy({ project }: { project: Project }) {
           <li aria-hidden="true">/</li>
           <li>
             <Link href="/#work" className="link-quiet">
-              Selected work
+              Selected Work
             </Link>
           </li>
           <li aria-hidden="true">/</li>
@@ -125,7 +87,7 @@ export function CaseStudy({ project }: { project: Project }) {
       </nav>
 
       <header className="border-b border-[var(--line)] pb-8">
-        <p className="eyebrow">Case study</p>
+        <p className="eyebrow">Case Study</p>
         <h1 className="mt-3 font-sans text-[1.9rem] font-medium leading-tight sm:text-[2.6rem]">
           {project.name}
         </h1>
@@ -137,11 +99,8 @@ export function CaseStudy({ project }: { project: Project }) {
           {[
             { term: "Role", detail: project.role },
             { term: "Period", detail: project.period },
-            { term: "State", detail: project.status },
-            {
-              term: "Documented",
-              detail: `${documented} of ${visibleSections.length} sections`,
-            },
+            { term: "Status", detail: project.status },
+            { term: "Focus", detail: "Architecture & Implementation" },
           ].map((cell) => (
             <div key={cell.term} className="bg-ink-raised px-4 py-3">
               <dt className="text-[0.68rem] uppercase tracking-label text-paper-faint">{cell.term}</dt>
@@ -177,7 +136,6 @@ export function CaseStudy({ project }: { project: Project }) {
             <li key={s.id}>
               <a href={`#${s.id}`} className="link-quiet capitalize">
                 {s.title}
-                {showDrafts && s.status === "todo" && <span className="ml-1 text-volt">*</span>}
               </a>
             </li>
           ))}
@@ -193,22 +151,19 @@ export function CaseStudy({ project }: { project: Project }) {
 
         <aside className="hidden lg:block">
           <div className="sticky top-24 rounded-xl border border-[var(--line)] bg-ink-raised/50 p-5">
-            <p className="eyebrow">Stack</p>
+            <p className="eyebrow">Tech Stack</p>
             <ul className="mt-3 space-y-1.5 text-[0.8rem] text-paper-muted">
               {project.stack.map((s) => (
                 <li key={s}>{s}</li>
               ))}
             </ul>
-            <p className="mt-5 text-[0.72rem] leading-relaxed text-paper-faint">
-              {showDrafts && "* marks a section waiting on source material."}
-            </p>
           </div>
         </aside>
       </div>
 
       {project.scopeNote && (
         <p className="mt-10 max-w-[70ch] rounded-xl border border-[var(--line)] bg-ink-raised/50 px-5 py-4 text-[0.84rem] leading-relaxed text-paper-muted">
-          <span className="font-sans text-[0.7rem] uppercase tracking-label text-volt">Scope</span>
+          <span className="font-sans text-[0.7rem] uppercase tracking-label text-volt">Scope Note</span>
           <span className="mt-1.5 block">{project.scopeNote}</span>
         </p>
       )}

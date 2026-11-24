@@ -5,7 +5,7 @@ export function PrincipleBand() {
   return (
     <section aria-labelledby="principle-heading" className="shell pb-6 pt-4 sm:pt-6">
       <h2 id="principle-heading" className="sr-only">
-        How I work
+        Engineering Philosophy
       </h2>
       <Reveal>
         <figure className="relative rounded-2xl border border-[var(--line)] bg-ink-raised/50 px-6 py-8 sm:px-10 sm:py-10">
@@ -19,7 +19,7 @@ export function PrincipleBand() {
             {profile.principle}
           </blockquote>
           <figcaption className="mt-4 text-[0.78rem] text-paper-faint">
-            From my summary - {profile.education}
+            Engineering philosophy · {profile.name}
           </figcaption>
         </figure>
       </Reveal>
@@ -33,7 +33,7 @@ export function EducationSection() {
       <div className="ticks mb-6 w-40 opacity-70" aria-hidden="true" />
       <Reveal>
         <h2 id="education-heading" className="font-sans text-[1.6rem] font-medium sm:text-[2rem]">
-          Education &amp; certifications
+          Education &amp; Certifications
         </h2>
       </Reveal>
 

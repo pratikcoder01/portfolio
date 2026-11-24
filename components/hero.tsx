@@ -1,17 +1,11 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import type { CSSProperties } from "react";
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 
 import { Magnetic } from "@/components/magnetic";
 import { PortraitPlate } from "@/components/portrait";
 import { facts, profile, socials } from "@/lib/data";
-
-const HeroField = dynamic(() => import("@/components/hero-field"), {
-  ssr: false,
-  loading: () => null,
-});
 
 const HEADLINE_CLASS =
   "mt-5 max-w-[22ch] font-sans text-[2.1rem] font-medium leading-[1.04] text-balance sm:text-[3rem] lg:text-[4rem]";
@@ -47,7 +41,16 @@ function Headline() {
 export function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="relative isolate overflow-hidden">
-      <HeroField />
+      {/* Clean, static, high-craft background surface with subtle ambient accent */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div
+          className="absolute -right-20 -top-20 h-[32rem] w-[32rem] rounded-full opacity-60"
+          style={{
+            background: "radial-gradient(circle, rgb(var(--volt-rgb) / 0.07), transparent 68%)",
+          }}
+        />
+        <div className="absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent,var(--line-strong),transparent)]" />
+      </div>
 
       <div className="shell relative pb-20 pt-24 sm:pb-24 sm:pt-28 lg:pb-28 lg:pt-32">
         <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-x-14">
@@ -92,7 +95,7 @@ export function Hero() {
                   href="#contact"
                   className="inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] px-5 py-2.5 font-sans text-[0.88rem] text-paper transition-colors hover:border-volt/60 hover:bg-volt/10"
                 >
-                  Start a conversation
+                  Get in touch
                   <ArrowUpRight className="h-4 w-4 text-volt" aria-hidden="true" />
                 </a>
               </Magnetic>

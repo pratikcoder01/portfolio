@@ -266,323 +266,33 @@
 }
 
 /* ============================================================
-   TiltSurface - project cards as instrument panels.
-
-   The pointer tilts the card in real 3D (perspective + preserve-3d), and the
-   content sits on translateZ shelves so the title, chips and architecture
-   diagram separate into depth layers as the card turns.
-
-   Two layers are painted (pointer light, edge ring: their gradient centre must
-   stay inside the rounded card, so they read --mx/--my directly). Two layers
-   move on the compositor only (sheen, crosshair: their artwork is static and
-   the element is transformed). Nothing here touches layout.
-
-   Every decorative layer is gated on --engage, which only JavaScript sets.
-   No JS, coarse pointer, small screen, low-power device or reduced motion means
-   --engage is never written, so the card renders as a plain flat card.
+   Tactile Surface - clean, high-craft project cards.
+   Crisp 1px border, smooth hover elevation, and refined typography.
    ============================================================ */
 
 .tilt-root {
-  perspective: 800px;
-  perspective-origin: 50% 50%;
+  display: block;
 }
 
 .tilt-inner {
   position: relative;
   height: 100%;
+}
+
+.tilt-card {
+  position: relative;
+  height: 100%;
   border-radius: 1rem;
-  transform-style: preserve-3d;
-}
-
-.tilt-card,
-.tilt-face {
-  transform-style: preserve-3d;
-}
-
-/* Depth shelves: the title floats off the card, the architecture diagram sits
-   furthest forward, so the card separates into layers as it turns. */
-[data-depth="1"] {
-  transform: translateZ(14px);
-}
-
-[data-depth="2"] {
-  transform: translateZ(26px);
-}
-
-[data-depth="3"] {
-  transform: translateZ(40px);
-}
-
-.tilt-light,
-.tilt-edge,
-.tilt-sheen,
-.tilt-cross,
-.tilt-ticks,
-.tilt-readout {
-  position: absolute;
-  pointer-events: none;
-}
-
-.tilt-light {
-  inset: 0;
-  border-radius: 1rem;
-  transform: translateZ(46px);
-  opacity: var(--engage, 0);
-  background: radial-gradient(
-    22rem 22rem at var(--mx, 50%) var(--my, 50%),
-    rgb(var(--volt-rgb) / 0.3),
-    rgb(var(--volt-rgb) / 0.11) 38%,
-    transparent 68%
-  );
-}
-
-/* 1px ring, brightest nearest the pointer: accent gradient masked down to the
-   border box only. */
-.tilt-edge {
-  inset: 0;
-  border-radius: 1rem;
-  padding: 1px;
-  transform: translateZ(47px);
-  opacity: var(--engage, 0);
-  background: radial-gradient(
-    15rem 15rem at var(--mx, 50%) var(--my, 50%),
-    rgb(var(--volt-rgb) / 0.95),
-    rgb(var(--volt-rgb) / 0.14) 55%,
-    rgb(var(--volt-rgb) / 0.22) 100%
-  );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) border-box;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) border-box;
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-}
-
-/* Diagonal gloss. Static artwork, compositor-moved by a few percent so it can
-   never bleed past the card gap. */
-.tilt-sheen {
-  inset: 0;
-  border-radius: 1rem;
-  transform: translate3d(
-      calc((var(--mx, 50%) - 50%) * 0.07),
-      calc((var(--my, 50%) - 50%) * -0.07),
-      45px
-    );
-  opacity: calc(var(--engage, 0) * 0.9);
-  background: radial-gradient(
-    65% 130% at 28% 6%,
-    rgb(var(--volt-rgb) / 0.14),
-    transparent 62%
-  );
-}
-
-/* Hairline crosshair tracking the pointer. Drawn at the centre of a full-card
-   element, so a percentage translate maps 1:1 to the pointer position and the
-   artwork never leaves the card. */
-.tilt-cross {
-  inset: 0;
-  transform: translateZ(44px);
-  opacity: calc(var(--engage, 0) * 0.6);
-}
-
-.tilt-cross-h {
-  background-image: linear-gradient(
-    to bottom,
-    transparent calc(50% - 0.5px),
-    rgb(var(--volt-rgb) / 0.36) calc(50% - 0.5px) calc(50% + 0.5px),
-    transparent calc(50% + 0.5px)
-  );
-  /* The line stops short of the rounded corners instead of crossing them. */
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 14% 86%, transparent);
-  mask-image: linear-gradient(to right, transparent, #000 14% 86%, transparent);
-}
-
-.tilt-cross-v {
-  background-image: linear-gradient(
-    to right,
-    transparent calc(50% - 0.5px),
-    rgb(var(--volt-rgb) / 0.36) calc(50% - 0.5px) calc(50% + 0.5px),
-    transparent calc(50% + 0.5px)
-  );
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14% 86%, transparent);
-  mask-image: linear-gradient(to bottom, transparent, #000 14% 86%, transparent);
-}
-
-.tilt-cross-h {
-  transform: translate3d(0, calc(var(--my, 50%) - 50%), 44px);
-}
-
-.tilt-cross-v {
-  transform: translate3d(calc(var(--mx, 50%) - 50%), 0, 44px);
-}
-
-/* Corner brackets + normalised pointer readout: the nerd detail that says
-   "instrument", not "hero gradient". */
-.tilt-ticks {
-  inset: 11px;
-  transform: translateZ(48px);
-  opacity: var(--engage, 0);
-}
-
-.tilt-ticks i {
-  position: absolute;
-  width: 9px;
-  height: 9px;
-  border: 1px solid rgb(var(--volt-rgb) / 0.6);
-}
-
-.tilt-ticks i:nth-child(1) { top: 0; left: 0; border-right: 0; border-bottom: 0; }
-.tilt-ticks i:nth-child(2) { top: 0; right: 0; border-left: 0; border-bottom: 0; }
-.tilt-ticks i:nth-child(3) { bottom: 0; left: 0; border-right: 0; border-top: 0; }
-.tilt-ticks i:nth-child(4) { bottom: 0; right: 0; border-left: 0; border-top: 0; }
-
-/* The readout lives in the card's left gutter, set vertically: it annotates the
-   surface like a drawing dimension instead of colliding with the content. */
-.tilt-readout {
-  left: 7px;
-  top: 50%;
-  writing-mode: vertical-rl;
-  transform: translate3d(0, -50%, 48px);
-  opacity: calc(var(--engage, 0) * 0.9);
-  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
-  font-variant-numeric: tabular-nums;
-  font-size: 0.65rem;
-  letter-spacing: 0.04em;
-  color: rgb(var(--volt-rgb) / 0.85);
-}
-
-/* The lift needs something to land on: in light mode the glow on paper is too
-   faint to read as height, so the card casts a shadow instead. */
-.tilt-root[data-engaged="true"] .tilt-card {
-  box-shadow: 0 28px 70px -34px rgb(8 9 13 / 0.8);
-}
-
-[data-theme="light"] .tilt-root[data-engaged="true"] .tilt-card {
-  box-shadow: 0 26px 56px -28px rgb(18 20 27 / 0.3), 0 2px 6px -2px rgb(18 20 27 / 0.14);
-}
-
-/* Only pay for compositing while a pointer is actually on the card. */
-.tilt-root[data-engaged="true"] .tilt-inner {
-  will-change: transform;
-}
-
-@media (prefers-reduced-motion: reduce), (pointer: coarse) {
-  .tilt-root {
-    perspective: none;
-  }
-
-  .tilt-inner {
-    transform: none !important;
-  }
-
-  .tilt-light,
-  .tilt-edge,
-  .tilt-sheen,
-  .tilt-cross,
-  .tilt-ticks,
-  .tilt-readout {
-    opacity: 0;
-  }
 }
 
 /* ============================================================
-   PortraitPlate — the photograph in the hero.
-
-   The studio backdrop is light grey, so the frame vignettes toward its own
-   edges to sit inside the page instead of on top of it. The scan band is one
-   transformed element (three frames tall, band drawn at its centre), so the
-   animation is compositor-only and never touches layout.
+   Portrait Frame — clean human developer photo presentation.
    ============================================================ */
 
 .portrait-frame {
-  box-shadow: 0 18px 46px -28px rgb(var(--volt-rgb) / 0.55);
+  box-shadow: 0 10px 30px -15px rgb(0 0 0 / 0.3);
 }
 
-.portrait-vignette {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: radial-gradient(125% 105% at 50% 42%, transparent 42%, rgb(8 9 13 / 0.6) 100%);
-}
-
-[data-theme="light"] .portrait-vignette {
-  background: radial-gradient(125% 105% at 50% 42%, transparent 48%, rgb(18 20 27 / 0.24) 100%);
-}
-
-.portrait-scan {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -100%;
-  height: 300%;
-  pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    transparent 48.4%,
-    rgb(var(--volt-rgb) / 0.55) 49.6% 50.4%,
-    transparent 51.6%
-  );
-  /* Idle it stays quiet; the sweep answers the pointer like the cards do. */
-  opacity: 0.3;
-  transition: opacity 0.45s ease-editorial;
-  animation: portrait-scan 9s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
-}
-
-.portrait-plate:hover .portrait-scan,
-.portrait-plate:focus-within .portrait-scan {
-  opacity: 0.9;
-}
-
-@keyframes portrait-scan {
-  from {
-    transform: translateY(-17%);
-  }
-  to {
-    transform: translateY(17%);
-  }
-}
-
-.portrait-ticks {
-  position: absolute;
-  inset: 6px;
-  pointer-events: none;
-}
-
-.portrait-ticks i {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  border: 1px solid rgb(var(--volt-rgb) / 0.75);
-}
-
-.portrait-ticks i:nth-child(1) { top: 0; left: 0; border-right: 0; border-bottom: 0; }
-.portrait-ticks i:nth-child(2) { top: 0; right: 0; border-left: 0; border-bottom: 0; }
-.portrait-ticks i:nth-child(3) { bottom: 0; left: 0; border-right: 0; border-top: 0; }
-.portrait-ticks i:nth-child(4) { bottom: 0; right: 0; border-left: 0; border-top: 0; }
-
-@media (min-width: 640px) {
-  .portrait-ticks {
-    inset: 7px;
-  }
-
-  .portrait-ticks i {
-    width: 8px;
-    height: 8px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .portrait-ticks {
-    inset: 9px;
-  }
-
-  .portrait-ticks i {
-    width: 11px;
-    height: 11px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .portrait-scan {
-    display: none;
-  }
+[data-theme="light"] .portrait-frame {
+  box-shadow: 0 10px 25px -15px rgb(18 20 27 / 0.15);
 }

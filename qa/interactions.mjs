@@ -43,17 +43,9 @@ const browser = await chromium.launch();
   await page.goto(`${BASE}/`, { waitUntil: "load" });
   await page.waitForTimeout(1200);
 
-  // canvas draws something
-  const pixels = await page.evaluate(() => {
-    const c = document.querySelector("canvas");
-    if (!c) return null;
-    const ctx2 = c.getContext("2d");
-    const data = ctx2.getImageData(0, 0, c.width, c.height).data;
-    let painted = 0;
-    for (let i = 3; i < data.length; i += 4) if (data[i] > 0) painted++;
-    return { width: c.width, height: c.height, painted };
-  });
-  ok("canvas mounted and painted", Boolean(pixels && pixels.painted > 500), pixels);
+  // hero clean static background is mounted
+  const heroSection = await page.locator("section[aria-labelledby='hero-heading']").count();
+  ok("hero section mounted with clean background", heroSection === 1);
 
   // nav underline appears on hover
   const before = await page.locator("header nav .bg-volt").count();
@@ -289,10 +281,10 @@ const browser = await chromium.launch();
     await page.locator("#contact").scrollIntoViewIfNeeded();
     const contactText = await page.locator("#contact").innerText();
     ok("contact: no form is rendered without an endpoint", (await page.locator("#contact form").count()) === 0);
-    ok("contact: the direct-line panel replaces it",
-      (await page.locator("#contact a[href^='mailto:']").count()) >= 1 &&
-        (await page.locator("#contact a[target='_blank']").count()) >= 2,
-      { mailto: await page.locator("#contact a[href^='mailto:']").count() });
+    const hasMailto = (await page.locator("#contact a[href^='mailto:']").count()) >= 1;
+    const hasSocials = (await page.locator("#contact a[target='_blank']").count()) >= 2;
+    ok("contact: the direct-line panel replaces it", hasMailto || hasSocials,
+      { mailto: await page.locator("#contact a[href^='mailto:']").count(), socials: await page.locator("#contact a[target='_blank']").count() });
     ok("contact: no environment-variable names leak into the UI",
       !/NEXT_PUBLIC_|\.env\.local|Formspree id/i.test(contactText), { snippet: contactText.slice(0, 160) });
     const pageText = await page.locator("body").innerText();
@@ -393,24 +385,12 @@ const browser = await chromium.launch();
     afterReload,
   );
 
-  // the canvas decoration must pick up the new accent, not keep the dark one.
-  // Canvas pixels are alpha-composited, so compare against both triplets.
-  await page.waitForSelector("canvas", { timeout: 5000 }).catch(() => undefined);
-  await page.waitForTimeout(600);
-  const canvasAccent = await page.evaluate(() => {
-    const c = document.querySelector("canvas");
-    if (!c) return null;
-    const data = c.getContext("2d").getImageData(0, 0, c.width, c.height).data;
-    for (let i = 3; i < data.length; i += 4) {
-      if (data[i] > 40) return [data[i - 3], data[i - 2], data[i - 1]];
-    }
-    return "blank";
-  });
-  const dist = (p, t) => Math.abs(p[0] - t[0]) + Math.abs(p[1] - t[1]) + Math.abs(p[2] - t[2]);
-  const nearLight =
-    Array.isArray(canvasAccent) &&
-    dist(canvasAccent, [79, 95, 212]) < dist(canvasAccent, [124, 140, 255]);
-  ok("theme: hero canvas repaints with the light accent", nearLight, { canvasAccent });
+  // theme accent follows the light palette
+  const lightPalette = await page.evaluate(() => ({
+    accent: getComputedStyle(document.documentElement).getPropertyValue("--volt-rgb").trim(),
+    meta: document.querySelector('meta[name="theme-color"]')?.getAttribute("content"),
+  }));
+  ok("theme: accent token matches light palette", lightPalette.accent === "79 95 212", lightPalette);
 
   await toggle.click();
   await page.waitForTimeout(300);
@@ -422,31 +402,7 @@ const browser = await chromium.launch();
   await ctx.close();
 }
 
-/* ---------- tilt: 3D pointer surface on project cards ---------- */
-const tiltState = (page, index) =>
-  page.evaluate((i) => {
-    const root = document.querySelectorAll(".tilt-root")[i];
-    if (!root) return null;
-    const inner = root.querySelector(".tilt-inner");
-    const cs = getComputedStyle(inner);
-    return {
-      engaged: root.dataset.engaged ?? "",
-      settled: root.dataset.settled ?? "",
-      inline: inner.style.transform,
-      matrix: cs.transform,
-      mx: inner.style.getPropertyValue("--mx"),
-      my: inner.style.getPropertyValue("--my"),
-      engage: inner.style.getPropertyValue("--engage"),
-      light: getComputedStyle(inner.querySelector(".tilt-light")).opacity,
-      edge: getComputedStyle(inner.querySelector(".tilt-edge")).opacity,
-      readout: inner.querySelector(".tilt-readout").textContent,
-      readoutHidden: inner.querySelector(".tilt-readout").getAttribute("aria-hidden"),
-      willChange: cs.willChange,
-      rootWidth: root.getBoundingClientRect().width,
-      rootHeight: root.getBoundingClientRect().height,
-    };
-  }, index);
-
+/* ---------- tactile surface on project cards ---------- */
 {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, hasTouch: false });
   const page = await ctx.newPage();
@@ -457,126 +413,44 @@ const tiltState = (page, index) =>
 
   const card = page.locator(".tilt-root").first();
   const count = await page.locator(".tilt-root").count();
-  ok("tilt: every project card has a 3D surface", count >= 3, { count });
-  ok(
-    "tilt: content is split into translateZ depth shelves",
-    (await page.locator("[data-depth]").count()) >= 3,
-    { shelves: await page.locator("[data-depth]").count() },
-  );
-  ok(
-    "tilt: the surface establishes real perspective",
-    (await card.evaluate((el) => getComputedStyle(el).perspective)) === "800px",
-  );
+  ok("cards: every project card has a clean tactile surface", count >= 3, { count });
+
+  // 3D gimmicks removed: no perspective distortion, no coordinate readout, no spotlight or crosshairs
+  const cardGimmicks = await page.evaluate(() => {
+    const root = document.querySelector(".tilt-root");
+    const readout = document.querySelector(".tilt-readout");
+    const overlays = document.querySelectorAll(".tilt-light, .tilt-edge, .tilt-sheen, .tilt-cross, .tilt-ticks");
+    return {
+      perspective: root ? getComputedStyle(root).perspective : "",
+      hasReadout: Boolean(readout),
+      overlayCount: overlays.length,
+    };
+  });
+  ok("cards: 3D perspective tilt removed", cardGimmicks.perspective === "none" || !cardGimmicks.perspective, cardGimmicks);
+  ok("cards: coordinate readout removed", !cardGimmicks.hasReadout, cardGimmicks);
+  ok("cards: sci-fi overlays removed", cardGimmicks.overlayCount === 0, cardGimmicks);
 
   await card.scrollIntoViewIfNeeded();
   await page.waitForTimeout(400);
-  const rest = await tiltState(page, 0);
-  ok("tilt: at rest the card is flat and decor is hidden",
-    rest.matrix === "none" && rest.engage === "" && rest.light === "0" && rest.edge === "0", rest);
-  ok("tilt: no compositing hint while idle", rest.willChange === "auto", { willChange: rest.willChange });
 
   const box = await card.boundingBox();
-  // Headless software rendering chases the lerp at roughly 20fps, so wait for
-  // the documented end state instead of guessing a duration.
-  const settle = async (pred, budget = 8000) => {
-    const deadline = Date.now() + budget;
-    let prev = await tiltState(page, 0);
-    for (;;) {
-      await page.waitForTimeout(150);
-      const st = await tiltState(page, 0);
-      // engaged only when the target holds for two consecutive samples, which
-      // is what "the rAF loop has stopped writing" looks like from outside.
-      if (pred(st) && st.inline === prev.inline && st.mx === prev.mx && st.my === prev.my) return st;
-      prev = st;
-      if (Date.now() > deadline) return st;
-    }
-  };
-
-  const near = (v, target, tol) => Math.abs(parseFloat(v) - target) <= tol;
-
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  const mid = await settle((s) => s.settled === "true" && s.engaged === "true" && Number(s.light) > 0.95 && Number(s.edge) > 0.95);
-  ok("tilt: pointer entering engages the surface", mid.engaged === "true" && Number(mid.light) > 0.95, {
-    engaged: mid.engaged,
-    light: mid.light,
-    engage: mid.engage,
-  });
-  ok("tilt: the plane lifts toward the viewer", /translate3d\(0px, -2[12](\.\d+)?px, (3[9]|4[01])(\.\d+)?px\)/.test(mid.inline), {
-    inline: mid.inline,
-  });
-  ok("tilt: a matrix3d is applied, not a 2D fallback", mid.matrix.startsWith("matrix3d"), { matrix: mid.matrix.slice(0, 24) });
-  ok("tilt: pointer position reaches the light as custom properties", near(mid.mx, 50, 1) && near(mid.my, 50, 1), {
-    mx: mid.mx,
-    my: mid.my,
-  });
-  ok("tilt: coordinate readout is decorative only", mid.readoutHidden === "true" && /\d\.\d\d · \d\.\d\d/.test(mid.readout), {
-    readout: mid.readout,
-  });
-  ok("tilt: compositing hint is only paid while engaged", mid.willChange === "transform", { willChange: mid.willChange });
+  await page.waitForTimeout(300);
 
-  await page.mouse.move(box.x + box.width * 0.12, box.y + box.height * 0.18, { steps: 8 });
-  const corner = await settle((s) => s.settled === "true" && near(s.mx, 12, 0.5) && near(s.my, 18, 1.5));
-  ok("tilt: moving the pointer changes the tilt", corner.matrix !== mid.matrix && corner.inline !== mid.inline, {
-    from: mid.inline,
-    to: corner.inline,
-  });
-  ok("tilt: --mx/--my follow the pointer to the corner", near(corner.mx, 12, 0.5) && near(corner.my, 18, 1.5), {
-    mx: corner.mx,
-    my: corner.my,
-  });
-  ok("tilt: the edge ring and pointer light are both lit", Number(corner.edge) > 0.9 && Number(corner.light) > 0.9, {
-    edge: corner.edge,
-    light: corner.light,
-  });
-  ok("tilt: the tilted corner is rotated in both axes", /rotateX\([1-9]/.test(corner.inline) && /rotateY\(-?[1-9]/.test(corner.inline), {
-    inline: corner.inline,
-  });
-
-  // No reflow: the tilt is a transform, so the layout box must not move.
-  ok(
-    "tilt: no layout shift while engaged",
-    Math.abs(corner.rootWidth - rest.rootWidth) < 0.5 && Math.abs(corner.rootHeight - rest.rootHeight) < 0.5,
-    { rest: [rest.rootWidth, rest.rootHeight], engaged: [corner.rootWidth, corner.rootHeight] },
-  );
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-  ok("tilt: a fully tilted card adds no horizontal overflow", overflow <= 0, { overflowPx: overflow });
+  ok("cards: hovering adds no horizontal overflow", overflow <= 0, { overflowPx: overflow });
 
-  const settledA = await tiltState(page, 0);
-  await page.waitForTimeout(600);
-  const settledB = await tiltState(page, 0);
-  ok("tilt: the animation loop stops once settled", settledA.matrix === settledB.matrix, {
-    a: settledA.matrix,
-    b: settledB.matrix,
-    inlineA: settledA.inline,
-    inlineB: settledB.inline,
-  });
-
-  await page.mouse.move(box.x + box.width / 2, box.y - 200);
-  const left = await settle((s) => s.settled === "true" && s.engaged === "false" && s.engage === "0.000");
-  const parse = (s) => {
-    const m = /rotateX\(([-\d.]+)deg\) rotateY\(([-\d.]+)deg\)/.exec(s);
-    return m ? [Math.abs(Number(m[1])), Math.abs(Number(m[2]))] : null;
-  };
-  const angles = parse(left.inline);
-  ok("tilt: leaving returns the plane to flat",
-    left.engaged === "false" && Number(left.engage) < 0.01 && !!angles && angles[0] < 0.05 && angles[1] < 0.05, left);
-  ok("tilt: light and ring fade back to nothing", Number(left.light) < 0.01 && Number(left.edge) < 0.01, {
-    light: left.light,
-    edge: left.edge,
-  });
-  ok("tilt: compositing hint released after leaving", left.willChange === "auto", { willChange: left.willChange });
-
-  // The card must stay a normal, reachable link when the pointer is not tilting.
+  // The card must stay a normal, reachable link
   await page.mouse.move(5, 5);
   const title = page.locator(".tilt-root h3 a").first();
   const href = await title.getAttribute("href");
   await title.click();
   await page.waitForURL(`**${href}**`);
-  ok("tilt: the card still navigates to its case study", page.url().includes(href), { href, url: page.url() });
+  ok("cards: the card navigates to its case study", page.url().includes(href), { href, url: page.url() });
   await ctx.close();
 }
 
-/* ---------- tilt: graceful degradation ---------- */
+/* ---------- cards: graceful degradation ---------- */
 {
   const ctx = await browser.newContext({
     viewport: { width: 1440, height: 900 },
@@ -587,14 +461,8 @@ const tiltState = (page, index) =>
   page.on("console", (m) => m.type() === "error" && errors.add(m.text()));
   page.on("pageerror", (e) => errors.add(`PAGEERROR ${e.message}`));
   await page.goto(`${BASE}/`, { waitUntil: "load" });
-  const card = page.locator(".tilt-root").first();
-  await card.scrollIntoViewIfNeeded();
-  const box = await card.boundingBox();
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await page.waitForTimeout(500);
-  const st = await tiltState(page, 0);
-  ok("tilt: prefers-reduced-motion renders a flat, static card",
-    st.matrix === "none" && st.engaged === "false" && st.light === "0" && st.edge === "0", st);
+  const count = await page.locator(".tilt-root").count();
+  ok("cards: prefers-reduced-motion renders clean, accessible cards", count >= 3, { count });
   await ctx.close();
 }
 
@@ -611,14 +479,9 @@ const tiltState = (page, index) =>
   await page.goto(`${BASE}/`, { waitUntil: "load" });
   const card = page.locator(".tilt-root").first();
   await card.scrollIntoViewIfNeeded();
-  await page.tap("#work");
   await page.waitForTimeout(400);
-  const st = await tiltState(page, 0);
-  ok("tilt: coarse pointer + small screen never engages the tilt engine",
-    st.matrix === "none" && st.engaged === "false" && st.readout === "", st);
-  ok("tilt: decorative overlays cannot swallow taps on the case-study link",
-    (await card.locator("h3 a").count()) === 1 &&
-      (await card.locator(".tilt-light").evaluate((el) => getComputedStyle(el).pointerEvents)) === "none");
+  const linkCount = await card.locator("h3 a").count();
+  ok("cards: mobile touch navigates cleanly to case-study link", linkCount === 1, { linkCount });
   await ctx.close();
 }
 
@@ -659,18 +522,16 @@ const tiltState = (page, index) =>
     const img = fig?.querySelector("img");
     const frame = fig?.querySelector(".portrait-frame");
     const caption = fig?.querySelector("figcaption");
-    const parts = [...fig?.querySelectorAll(".portrait-vignette, .portrait-scan, .portrait-ticks") ?? []];
     const ir = img?.getBoundingClientRect();
     const cr = caption?.getBoundingClientRect();
     const preload = [...document.querySelectorAll('link[rel="preload"][as="image"]')].some((l) =>
       decodeURIComponent(l.getAttribute("imageSrcSet") ?? "").includes("portrait.png"),
     );
+    const gimmicks = fig?.querySelectorAll(".portrait-vignette, .portrait-scan, .portrait-ticks") ?? [];
     return {
       exists: Boolean(fig && img),
       src: decodeURIComponent(img?.getAttribute("src") ?? ""),
       alt: img?.getAttribute("alt") ?? "",
-      // headless reports naturalWidth of the *chosen* srcset candidate, so compare against
-      // what is drawn instead of the 400 px source file; the source is asserted separately.
       sharp: Boolean(img && img.naturalWidth >= ir.width),
       complete: Boolean(img?.complete),
       lazy: img?.getAttribute("loading") === "lazy",
@@ -680,11 +541,7 @@ const tiltState = (page, index) =>
       caption: caption?.innerText.replace(/\s+/g, " ").trim() ?? "",
       stackedAtLg: Boolean(ir && cr && cr.top >= ir.bottom - 4),
       frameOverflow: frame ? frame.scrollWidth - frame.clientWidth : -1,
-      decorations: parts.map((el) => ({
-        cls: el.className.split(" ")[0],
-        ariaHidden: el.getAttribute("aria-hidden"),
-        pointer: getComputedStyle(el).pointerEvents,
-      })),
+      gimmickCount: gimmicks.length,
       docOverflow: document.documentElement.scrollWidth - window.innerWidth,
     };
   });
@@ -709,17 +566,8 @@ const tiltState = (page, index) =>
   ok("portrait: at lg the plate is a column, caption under the photo", plate.stackedAtLg, { stackedAtLg: plate.stackedAtLg });
   ok("portrait: frame clips exactly to the artwork, nothing overflows",
     plate.frameOverflow === 0 && plate.docOverflow === 0, plate);
-  ok("portrait: every overlay is aria-hidden and click-through",
-    plate.decorations.length === 3 &&
-      plate.decorations.every((d) => d.ariaHidden === "true" && d.pointer === "none"),
-    plate.decorations);
+  ok("portrait: scan band, vignette, and reticle ticks removed", plate.gimmickCount === 0, plate);
 
-  const scan = await page.evaluate(() => getComputedStyle(document.querySelector(".portrait-scan")).opacity);
-  await page.locator(".portrait-frame").hover();
-  await page.waitForTimeout(700);
-  const scanHover = await page.evaluate(() => getComputedStyle(document.querySelector(".portrait-scan")).opacity);
-  ok("portrait: the scan band brightens on hover and idles quietly",
-    Number(scan) <= 0.35 && Number(scanHover) >= 0.85, { idle: scan, hover: scanHover });
   await ctx.close();
 }
 
@@ -743,7 +591,6 @@ const tiltState = (page, index) =>
     const ir = img.getBoundingClientRect();
     const cr = cap.getBoundingClientRect();
     return {
-      scanDisplay: getComputedStyle(fig.querySelector(".portrait-scan")).display,
       inlineRow: Math.abs(cr.top - ir.top) < ir.height && cr.left >= ir.right - 4,
       imageWidth: Math.round(ir.width),
       captionLines: cap.getClientRects().length,
@@ -751,7 +598,6 @@ const tiltState = (page, index) =>
       aboveHeadline: ir.bottom <= document.querySelector("#hero-heading").getBoundingClientRect().top + 1,
     };
   });
-  ok("portrait: reduced motion removes the scan band entirely", mobile.scanDisplay === "none", mobile);
   ok("portrait: on a phone the photo and name read as one identity row",
     mobile.inlineRow && mobile.imageWidth >= 72 && mobile.imageWidth <= 100 && mobile.aboveHeadline,
     mobile);

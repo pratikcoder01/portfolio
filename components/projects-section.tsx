@@ -2,7 +2,7 @@ import { ProjectCard } from "@/components/project-card";
 import { Reveal } from "@/components/reveal";
 import { projects } from "@/lib/data";
 
-/** Slugs that appear in the main "Selected work" grid. */
+/** Slugs that appear in the main "Selected Work" grid. */
 const MAIN_SLUGS = ["athlix", "dojo-nation", "platecam"];
 
 const mainProjects = projects.filter((p) => MAIN_SLUGS.includes(p.slug));
@@ -15,11 +15,10 @@ export function ProjectsSection() {
       <Reveal className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 id="work-heading" className="font-sans text-[1.6rem] font-medium sm:text-[2rem]">
-            Selected work
+            Selected Work
           </h2>
           <p className="mt-3 max-w-[62ch] text-[0.92rem] leading-relaxed text-paper-muted">
-            Each card is drawn from what the repository actually documents. Open a project for the
-            case study; anything I have not written up yet is marked rather than invented.
+            Production systems, full-stack applications, and engineering projects I&apos;ve designed and built.
           </p>
         </div>
         <p className="eyebrow shrink-0">{projects.length} projects</p>
@@ -38,9 +37,9 @@ export function ProjectsSection() {
       {earlierProjects.length > 0 && (
         <div className="mt-14">
           <Reveal>
-            <h3 className="font-sans text-[1.1rem] font-medium text-paper-muted">Earlier work</h3>
+            <h3 className="font-sans text-[1.1rem] font-medium text-paper-muted">Foundational Projects</h3>
             <p className="mt-1 max-w-[52ch] text-[0.84rem] text-paper-faint">
-              Smaller projects from earlier in the timeline — the full case study is still accessible.
+              Earlier algorithmic solvers, console tools, and systems exercises.
             </p>
           </Reveal>
           <div className="mt-6 grid gap-5 md:grid-cols-2">

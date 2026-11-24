@@ -3,23 +3,13 @@ import Image from "next/image";
 import { profile } from "@/lib/data";
 
 /**
- * PortraitPlate — the one photograph on the site, presented as an instrument
- * plate rather than a stock headshot: reticle brackets at the corners, a slow
- * scan band crossing the frame, and a caption set in the same voice as the nav.
- *
- * Layout follows the hero: below `lg` the plate is a horizontal identity row
- * (photo left, name and title beside it) so the photograph never floats alone
- * above the headline; at `lg` it becomes the vertical plate in the second
- * column, caption underneath.
- *
- * The source is a 400x400 photo, so it is displayed at 80-96px on small
- * screens and 240px at most — never upscaled past roughly 1.2x, which is where
- * a portrait starts to look soft.
+ * PortraitPlate — clean, human developer portrait.
+ * Displayed cleanly with a subtle rounded frame, high-craft typography, and no gimmicky scan bands.
  */
 export function PortraitPlate({ className = "" }: { className?: string }) {
   return (
     <figure className={`portrait-plate flex items-center gap-4 lg:block lg:gap-0 ${className}`}>
-      <div className="portrait-frame relative w-20 shrink-0 overflow-hidden rounded-xl border border-[var(--line-strong)] bg-ink-card sm:w-24 lg:w-full">
+      <div className="portrait-frame relative w-20 shrink-0 overflow-hidden rounded-2xl border border-[var(--line-strong)] bg-ink-card shadow-sm sm:w-24 lg:w-full">
         <Image
           src="/portrait.png"
           alt={`Portrait of ${profile.name}`}
@@ -27,18 +17,8 @@ export function PortraitPlate({ className = "" }: { className?: string }) {
           height={400}
           priority
           sizes="(min-width: 1024px) 240px, 96px"
-          className="block h-auto w-full"
+          className="block h-auto w-full object-cover"
         />
-        {/* Vignette: the studio backdrop is light grey, so the frame darkens
-            toward its own edges to sit inside the page instead of on it. */}
-        <span aria-hidden="true" className="portrait-vignette" />
-        <span aria-hidden="true" className="portrait-scan" />
-        <span aria-hidden="true" className="portrait-ticks">
-          <i />
-          <i />
-          <i />
-          <i />
-        </span>
       </div>
 
       <figcaption className="min-w-0 lg:mt-3">

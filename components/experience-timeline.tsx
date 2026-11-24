@@ -6,7 +6,6 @@ import { useRef, useState } from "react";
 
 import { Reveal } from "@/components/reveal";
 import { experience, type ExperienceEntry } from "@/lib/data";
-import { showDrafts } from "@/lib/site";
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion";
 
 function Entry({ item, isFirst }: { item: ExperienceEntry; isFirst: boolean }) {
@@ -81,15 +80,6 @@ function Entry({ item, isFirst }: { item: ExperienceEntry; isFirst: boolean }) {
               </ul>
             )}
 
-            {showDrafts && item.detailTodo && (
-              <p className="mt-4 rounded-lg border border-dashed border-volt/35 bg-volt/[0.06] px-3 py-2 text-[0.78rem] text-paper-muted">
-                <span className="font-sans text-[0.7rem] uppercase tracking-label text-volt">
-                  To be completed
-                </span>
-                <span className="mt-1 block">{item.detailTodo}</span>
-              </p>
-            )}
-
             {item.tags.length > 0 && (
               <ul className="mt-4 flex flex-wrap gap-1.5">
                 {item.tags.map((t) => (
@@ -110,43 +100,57 @@ function Entry({ item, isFirst }: { item: ExperienceEntry; isFirst: boolean }) {
 }
 
 export function ExperienceTimeline() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const reduce = usePrefersReducedMotion();
-  const railRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
-    target: railRef,
-    offset: ["start 82%", "end 45%"],
+    target: containerRef,
+    offset: ["start 70%", "end 60%"],
   });
-  const eased = useTransform(scrollYProgress, [0, 1], [0, 1]);
-  const spring = useSpring(eased, { stiffness: 140, damping: 30, mass: 0.4 });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 140,
+    damping: 24,
+    restDelta: 0.001,
+  });
+
+  const scaleY = useTransform(smoothProgress, [0, 1], [0, 1]);
 
   return (
-    <section id="experience" aria-labelledby="experience-heading" className="shell py-20 sm:py-24">
+    <section id="experience" aria-labelledby="exp-heading" className="shell py-20 sm:py-24">
       <div className="ticks mb-6 w-40 opacity-70" aria-hidden="true" />
-      <Reveal>
-        <h2 id="experience-heading" className="font-sans text-[1.6rem] font-medium sm:text-[2rem]">
-          Experience
-        </h2>
-        <p className="mt-3 max-w-[62ch] text-[0.92rem] leading-relaxed text-paper-muted">
-          Select any role to expand it. The spine fills as you read down the record.
-        </p>
+      <Reveal className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 id="exp-heading" className="font-sans text-[1.6rem] font-medium sm:text-[2rem]">
+            Experience &amp; Roles
+          </h2>
+          <p className="mt-3 max-w-[56ch] text-[0.92rem] leading-relaxed text-paper-muted">
+            Internships, open-source engineering, and student organization leadership.
+          </p>
+        </div>
+        <p className="eyebrow shrink-0">{experience.length} milestones</p>
       </Reveal>
 
-      <div ref={railRef} className="relative mt-12">
+      <div ref={containerRef} className="relative mt-12">
+        {/* Track */}
         <div
+          className="absolute bottom-4 left-0 top-4 w-px bg-[var(--line)]"
           aria-hidden="true"
-          className="pointer-events-none absolute left-0 top-0 hidden h-full w-px bg-[var(--line)] sm:block"
-        >
-          <m.div
-            data-spine=""
-            className="h-full w-px origin-top bg-gradient-to-b from-volt via-volt/50 to-volt/10"
-            style={{ scaleY: reduce ? 1 : spring }}
-          />
-        </div>
+        />
 
-        <ol className="relative space-y-4">
-          {experience.map((item, i) => (
-            <Entry key={item.id} item={item} isFirst={i === 0} />
+        {/* Scroll-driven spine indicator */}
+        {!reduce && (
+          <m.div
+            data-spine
+            style={{ scaleY }}
+            className="absolute bottom-4 left-0 top-4 w-px origin-top bg-volt"
+            aria-hidden="true"
+          />
+        )}
+
+        <ol className="space-y-6">
+          {experience.map((item, index) => (
+            <Entry key={item.id} item={item} isFirst={index === 0} />
           ))}
         </ol>
       </div>

@@ -63,8 +63,7 @@ export function SiteFooter() {
 
         <div className="mt-10 flex flex-col gap-3 border-t border-[var(--line)] pt-6 text-[0.75rem] text-paper-faint sm:flex-row sm:items-center sm:justify-between">
           <p>
-            Built with Next.js, TypeScript and Tailwind CSS. Every claim on this page is sourced from
-            my profile or a public repository.
+            Built with Next.js, TypeScript, and Tailwind CSS. Designed with editorial typography and accessible standards.
           </p>
           <a
             href="#main"
